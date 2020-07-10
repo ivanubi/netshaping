@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices')}}">Network Devices</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices', id=interface.device.id)}}">{{interface.device.name}}</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('interfaces', id=interface.id)}}">{{interface.name}}</a>                
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('update_interface', id=interface.id)}}">Settings</a>                
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <form>
+            <input name="interface_id" value="{{interface.id}}" hidden>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-title">Interface Information</div>
+                            <div class="form-group form-inline">
+                                <label for="interfaceName">Interface: </label>
+                                <span>
+                                <span class="ml-3">
+                                    {{interface.name}}
+                                </span>
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                <label for="bandwidth">Bandwidth: </label>
+                                    <span class="ml-3 form-inline">
+                                        <input class="form-control" type="number" name="bandwidth" id="bandwidth"
+                                        value={{interface.bandwidth}} required></input>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">kbps</span>
+                                    </div>
+                                </span>
+                                </div>
+                        
+                            </div>
+                            <div class="form-group">
+                                <div>
+                                    <label for="description">Description:</label>
+                                </div>
+                                <textarea class="form-control" id="description" name="description">{%if interface.description:%}{{interface.description}}{%endif%}</textarea>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card-title">Applied Policy</div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="policy_id">Policy: </label>
+                                    <div class="ml-2">
+                                        <div>
+                                            <select class="form-control" id="policy_id" name="policy_id" id="policy_id" required>
+                                                {% if interface.policy: %}
+                                                <option value="{{interface.policy.id}}" selected>{{interface.policy.name}} [Current]</option>
+                                                {% endif %}
+                                                {% for policy in policies: %}
+                                                <option value="{{policy.id}}">{{policy.name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card-footer bg-transparent row">
+                        <div class="col">
+                            <div id="alert"></div>
+                            {% if error: %}
+                                <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                                    <strong>Error!</strong> {{error}}.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <div class="float-right">
+                                <button form="deleteInterface" type="submit" class="btn btn-danger">Delete Interface</button>
+                                <a href="{{ url_for('interfaces', id=interface.id) }}" class="btn btn-secondary">Cancel</a>
+                                <button onclick="setPolicyToInt({{interface.id}})" id="submitButton" type="button" class="btn btn-success">Send Settings to the Interface</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>                          
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="commandsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="w-100 modal-title text-center" id="exampleModalLabel">Commands</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <small id="commandsModalBody" class="text-monospace">
+            </small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<form id="deleteInterface" action="{{url_for('delete_interface', id=interface.id)}}" method="POST">
+</form>
+<script src="{{url_for('static', filename='js/interface.js')}}"></script>
+{% endblock %}

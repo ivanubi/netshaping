@@ -1,0 +1,5 @@
+{
+    "python.linting.enabled": false,
+    "eslint.enable": false,
+    "python.formatting.provider": "black"
+}

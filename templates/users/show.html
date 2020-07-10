@@ -1,0 +1,80 @@
+{% extends "base.html" %} {% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('users', id=user.id)}}">Profile</a>
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('users')}}">Users</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('users', id=current_user.id)}}">{{user.name}}</a>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-sm-6">
+                    <div class="float-right d-none d-md-block">
+                        <a href="#" class="btn btn-primary">
+                            <i class="mdi mdi-settings mr-2"></i>
+                            Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-title">Personal Information</div>
+                            <div class="form-group form-inline">
+                                <label for="deviceType">Full Name: </label>
+                                <span>
+                                    <span class="ml-3">
+                                        {{user.name}}
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label>Email: </label>
+                                    <span class="ml-3">
+                                        {{user.email}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div>
+                                    <label for="deviceDescription">Date Created:</label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    {{user.created_on}}
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <div>
+                                    <label>Last Login:</label>
+                                </div>
+                                <small class="form-text text-muted">
+                                    {{user.last_login}}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="card-footer bg-transparent">
+                        <div class="float-right">
+                            <a href="#" class="btn btn-secondary">Get Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

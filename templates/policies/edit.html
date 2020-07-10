@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                            <a href="{{url_for('policies')}}">Network Policies</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{url_for('policies', id=policy.id)}}">{{policy.name}}</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                            <a href="{{url_for('update_policy', id=policy.id)}}">Settings</a>
+                            </li>
+                        </ol>
+                </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+        </div>
+        <form id="form" method="POST">
+            <div class="card" style="width: 100%">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card-title">Policy Information</div>
+                            <div class="form-group form-inline">
+                                <label for="policyName">Policy Name: </label>
+                                <span>
+                                    <input type="text" class="form-control ml-3" 
+                                    id="policyName" name="policyName" 
+                                    aria-describedby="policyName"
+                                    placeholder="name" maxlength="30" 
+                                    value={{policy.name}} required>
+                                    </input>
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <div class="">
+                                    <label for="policyDescription">Description: <span class="badge">Optional</span></label>
+                                    <textarea class="form-control" id="policyDescription" name="policyDescription" aria-describedby="policy description" maxlength="2000">{{policy.description}}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card-title">Traffic Treatment</div>
+                            <div id="policyServices">
+                                {% for service_settings in policy.services: %}
+                                    <div id="service{{loop.index0}}" class="form-group">
+                                        <div class="form-inline">
+                                            <label for="serviceIps">Service #{{loop.index0 + 1}}: </label>
+                                            <span>
+                                                <select class="form-control ml-3" id="serviceSelect{{loop.index0}}" 
+                                                name="services[{{loop.index0}}][service_id]" 
+                                                aria-describedby="serviceIps">
+                                                <option value="{{service_settings.service_id}}">{{service_settings.service.name}} [Current]</option>
+                                                </select>
+                                            </span>
+                                        </div>
+                                        <div class="form-inline mt-1 ml-3">
+                                            <label class="mr-2">- Minimum Bandwidth:</label>
+                                                <input name="services[{{loop.index0}}][min_bandwidth]"
+                                                 class="form-control" type="number" min="0" max="20000000"
+                                                 value="{{service_settings.min_bandwidth}}"
+                                                onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"></input>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">kbps</span>
+                                                </div>  
+                                        </div>
+                                        <div class="form-inline mt-1 ml-3">
+                                            <label class="mr-2">- Shape Bandwidth:</label>
+                                            <input name="services[{{loop.index0}}][hard_bandwidth]" class="form-control" 
+                                            value="{{service_settings.max_bandwidth}}"
+                                            type="number" min="0" max="2000000"
+                                            onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"></input>
+                                            <div class="input-group-append">
+                                                <span class="input-group-text">kbps</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-inline mt-1 ml-3">
+                                            <label class="mr-2">- Mark Traffic with DSCP value:</label>
+                                            <select name="services[{{loop.index0}}][mark_dscp]" class="form-control mr-1">
+                                                <option 
+                                                {% if (service_settings.mark_dscp or service_settings.mark_dscp == 0): %}
+                                                value="{{service_settings.mark_dscp}}"
+                                                {% endif %}
+                                                selected>{{service_settings.mark_dscp}} [Current]</option>
+                                                <option value="0">0</option>
+                                                <option value="8">8</option>
+                                                <option value="10">10</option>
+                                                <option value="12">12</option>
+                                                <option value="14">14</option>
+                                                <option value="16">16</option>
+                                                <option value="18">18</option>
+                                                <option value="20">20</option>
+                                                <option value="22">22</option>
+                                                <option value="24">24</option>
+                                                <option value="26">26</option>
+                                                <option value="28">28</option>
+                                                <option value="30">30</option>
+                                                <option value="32">32</option>
+                                                <option value="34">34</option>
+                                                <option value="36">36</option>
+                                                <option value="38">38</option>
+                                                <option value="40">40</option>
+                                                <option value="46">46</option>
+                                                <option value="48">48</option>
+                                                <option value="56">56</option>                    
+                                            </select>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div id="serviceButtonGroup" class="form-group form-inline">
+                                <button id="addServiceButton" onclick="addAnotherPolicyService()" type="button" class="btn btn-info btn-sm">Add Service +</button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="card-footer bg-transparent row">
+                        <div class="col" id="errorAlert">
+                                
+                        </div>
+                        <div clas="col">
+                            <div class="float-right">
+                                <a href="{{url_for('policies', id=policy.id)}}" class="btn btn-secondary">Cancel</a>
+                                <button form="deletePolicy" type="submit" class="btn btn-danger">Delete</button>
+                                <button onclick="handleForm()" type="button" class="btn btn-success">Save Policy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>                          
+        </form>
+    </div>
+</div>
+<form id="deletePolicy" action="{{url_for('delete_policy', id=policy.id)}}" method="POST">
+</form>
+<script src="{{url_for('static', filename='js/policy.js')}}"></script>
+<script>
+    setIterationValue({{policy.services|length}});
+</script>
+{% endblock %}

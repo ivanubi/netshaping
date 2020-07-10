@@ -1,0 +1,128 @@
+{% extends "base.html" %} {% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('services')}}">Network Services</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('services', id=service.id)}}">{{service.name}}</a>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-sm-6">
+                    {% if service.type != 'protocol': %}
+                    <div class="float-right d-none d-md-block">
+                        <a
+                            href="{{url_for('update_service', id=service.id)}}"
+                            class="btn btn-primary"
+                        >
+                            <i class="mdi mdi-settings mr-2"></i>Settings
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <form>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-title">Service Information</div>
+                            <div class="form-group form-inline">
+                                <label>Service Name: </label>
+                                <span class="ml-1">
+                                    {% if service.type == 'protocol': %}
+                                    <span class="text-uppercase">{{service.name}}</span>
+                                    {% else: %} {{service.name}} {% endif %}
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <div>
+                                    <label>Description:</label>
+                                    <div class="ml-1 text-muted">
+                                        {% if service.type == 'protocol': %} The
+                                        <span class="text-uppercase">{{service.name}}</span>
+                                        protocol {% else: %} {{service.description}} {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card-title">Match Traffic</div>
+                            {% if service.type != 'protocol': %}
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label>Protocol: </label>
+                                    <span class="ml-1 text-uppercase text-success">
+                                        {% if service.match_protocol: %} {{service.match_protocol}}
+                                        {% else: %} Any {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label>IPs/Domains: </label>
+                                    <span class="ml-1 text-success">
+                                        {{service.match_ips}}
+                                    </span>
+                                </div>
+                                <small>Multiple ips or domains are separated by commas.</small>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label>TCP Ports: </label>
+                                    <span class="ml-1 text-success">
+                                        {{service.match_tcp_ports}}
+                                    </span>
+                                </div>
+                                <small>Multiple TCP ports are separated by commas.</small>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label>UDP Ports: </label>
+                                    <span class="ml-1 text-success">
+                                        {{service.match_udp_ports}}
+                                    </span>
+                                </div>
+                                <small>Multiple UDP ports are separated by commas.</small>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label>Match DSCP Value: </label>
+                                    <span class="ml-1 text-success">
+                                        {{service.match_dscp}}
+                                    </span>
+                                </div>
+                                <small>Multiple DSCP values are separated by commas.</small>
+                            </div>
+                            {% else: %}
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label>Match Protocol: </label>
+                                    <span class="ml-1 text-success text-uppercase">
+                                        {{service.match_protocol}}
+                                    </span>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="float-right">
+                            <a href="{{url_for('services')}}" class="btn btn-secondary">Get Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

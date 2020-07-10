@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices')}}">Network Devices</a>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-sm-6">
+                    <div class="float-right d-none d-md-block">
+                        <a
+                            href="{{url_for('new_device')}}"
+                            class="btn btn-success arrow-none waves-effect waves-light"
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                        >
+                            <i class="mdi mdi-plus mr-2"></i> New Device
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="card-group">
+                {% if not devices: %}
+                <span style="margin-left: 400px; margin-top: 150px;" class="h4 text-center">
+                    0 devices found</span
+                >
+                {% endif %} {% for device in devices: %}
+                <div class="col-sm-2">
+                    <div class="card">
+                        <img
+                            class="card-img-top img-fluid"
+                            src="https://www.datacenterknowledge.com/sites/datacenterknowledge.com/files/styles/article_featured_standard/public/Data-Center-Racks_0.jpg?itok=LWSwU7vl"
+                            alt="Card image cap"
+                        />
+                        <div class="card-body">
+                            <div class="card-text text-center">
+                                {{device.name}}
+                            </div>
+                            <a
+                                href="{{url_for('devices', id=device.id)}}"
+                                class="stretched-link"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

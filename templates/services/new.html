@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+
+                    <div class="col-sm-6">
+                        <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                        </h4>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{{url_for('services')}}">Network Services</a>
+
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{url_for('new_service')}}">New</a>
+                            </li>
+                        </ol>
+                    </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+        </div>
+        <form method="POST">
+            <div class="card" style="width: 100%">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-title">Service Information</div>
+                            <div class="form-group form-inline">
+                                <label for="serviceName">Service Name: </label>
+                                <span>
+                                    <input 
+                                    type="text" class="form-control ml-3" id="serviceName" 
+                                    name="serviceName" aria-describedby="serviceName" 
+                                    placeholder="Service Name" 
+                                    {% if service.name: %}
+                                    value="{{service.name}}"
+                                    {% endif %}
+                                    required>
+                                    </input>
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                    <label for="serviceDescription">Description: <span class="badge">Optional</span></label>
+                                    <textarea class="form-control" id="serviceDescription" name="serviceDescription" aria-describedby="serviceDescription">{% if service.description: %}{{service.description}}{% endif %}</textarea>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card-title">Match Traffic</div>
+                            <div class="form-inline mb-2">
+                                <label for="protocol">Protocol: </label>
+                                <select type="text" class="form-control ml-3" id="protocol" 
+                                name="protocol" aria-describedby="protocol">
+                                <option value=''>Any</option>
+                                {% for protocol_service in service.supported_protocols_services(): %}
+                                    <option class="text-uppercase" value="{{protocol_service.match_protocol}}">{{protocol_service.name}}</option>
+                                {% endfor %}
+                                </select>
+                                <small>Match the protocol, if you only want to match IPs, port or dscp just leave it in 'Any'.</small>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="serviceIps">IPs/Domains: </label>
+                                        <input type="text" class="form-control ml-3" id="serviceIps" 
+                                        name="serviceIps" aria-describedby="serviceIps" 
+                                        {% if service.match_ips: %}
+                                        value="{{service.match_ips}}"
+                                        {% endif %}
+                                        placeholder="10.0.0.1, 10.0.0.2">
+                                        </input>
+                                </div>
+                                <small>Multiple ips or domains must be separated by commas.</small>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="serviceTCPPorts">TCP Ports: </label>
+                                        <input type="text" class="form-control ml-3" id="serviceTCPPorts" name="serviceTCPPorts" aria-describedby="serviceTCPPorts" 
+                                        {% if service.match_tcp_ports: %}
+                                        value="{{service.match_tcp_ports}}"
+                                        {% endif %}
+                                        placeholder="80, 8080" >
+                                        </input>
+                                </div>
+                                <small>Multiple TCP ports must be separated by commas.</small>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="serviceUDPPorts">UDP Ports: </label>
+                                        <input type="text" class="form-control ml-3" id="serviceUDPPorts" name="serviceUDPPorts" aria-describedby="serviceUDPPorts" 
+                                        {% if service.match_udp_ports: %}
+                                        value="{{service.match_udp_ports}}"
+                                        {% endif %}
+                                        placeholder="80, 8080" >
+                                        </input>
+                                </div>
+                                <small>Multiple UDP ports must be separated by commas.</small>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="serviceDSCPsValues">Match DSCP Value: </label>
+                                        <input type="text" class="form-control ml-3" id="serviceDSCPsValues" name="serviceDSCPsValues" 
+                                        aria-describedby="serviceDSCPsValues" 
+                                        {% if service.match_dscp: %}
+                                        value="{{service.match_dscp}}"
+                                        {% endif %}
+                                        placeholder="46, 50" >
+                                        </input>
+                                    </div>
+                                <small>Multiple DSCP values must be separated by commas.</small>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="card-footer bg-transparent row">
+                        <div class="col">
+                            {% if error: %}
+                                <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                                    <strong>Error!</strong> {{error}}.
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col">
+                            <div class="float-right">
+                            <a href="{{ url_for('services') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-success">Create New Service</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>                          
+        </form>
+    </div>
+</div>
+{% endblock %}

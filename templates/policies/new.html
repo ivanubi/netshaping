@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                            <a href="{{url_for('policies')}}">Network Policies</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                            <a href="{{url_for('new_policy')}}">New Policy</a>
+                            </li>
+                        </ol>
+                </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+        </div>
+        <form id="form" method="POST">
+            <div class="card" style="width: 100%">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card-title">Policy Information</div>
+                            <div class="form-group form-inline">
+                                <label for="policyName">Policy Name: </label>
+                                <span>
+                                    <input type="text" class="form-control ml-3" id="policyName" name="policyName" aria-describedby="policyName" placeholder="name" maxlength="30" required>
+                                    </input>
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <div class="">
+                                    <label for="policyDescription">Description: <span class="badge">Optional</span></label>
+                                    <textarea class="form-control" id="policyDescription" name="policyDescription" aria-describedby="policy description" maxlength="2000"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card-title">Traffic Treatment</div>
+                            <div id="policyServices">
+                            </div>
+                            <div id="serviceButtonGroup" class="form-group form-inline">
+                                <button id="addServiceButton" onclick="addAnotherPolicyService()" type="button" class="btn btn-info btn-sm">Add Service +</button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="float-right">
+                            <a href="{{url_for('policies')}}" class="btn btn-secondary">Cancel</a>
+                            <button onclick="handleForm()" type="button" class="btn btn-success">Create New Policy</button>
+                        </div>
+                        </div>
+                </div>
+            </div>                          
+        </form>
+    </div>
+</div>
+<script src="{{url_for('static', filename='js/policy.js')}}"></script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('policies')}}">Network Policies</a>
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-sm-6">
+                    <div class="float-right d-none d-md-block">
+                        <a
+                            href="{{url_for('new_policy')}}"
+                            class="btn btn-success arrow-none waves-effect waves-light"
+                            type="button"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                        >
+                            <i class="mdi mdi-plus mr-2"></i> New Policy
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            {% if not policies: %}
+            <span style="margin-left: 400px; margin-top: 150px;" class="h4 text-center">
+                0 policies found</span
+            >
+            {% endif %} {% for policy in policies: %}
+            <div class="col-sm-2">
+                <div class="card" style="height: 65%;">
+                    <div class="card-body">
+                        <div class="card-title text-center">
+                            {{policy.name}}<a
+                                class="stretched-link"
+                                href="{{url_for('policies', id=policy.id)}}"
+                            ></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

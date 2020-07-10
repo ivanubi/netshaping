@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                     <a href="{{url_for('devices')}}">Network</a> 
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices')}}">Network Devices</a> 
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices', id=device.id)}}">{{device.name}}</a> 
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('update_device', id=device.id)}}">Settings</a> 
+                        </li>
+                    </ol>
+                </div>
+                <div class="col-sm-6">
+                </div>
+            </div>
+        </div>
+        <form method="POST">
+            <div class="card" style="width: 100%">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card-title">Device Information</div>
+                            <div class="form-group form-inline">
+                                <label for="deviceType">Device Type: </label>
+                                <span>
+                                <select class="form-control ml-3" id="deviceType" name="deviceType" aria-describedby="deviceType"
+                                {% if device.device_type: %}
+                                value="{{device.device_type}}" 
+                                {% endif %}>
+                                    <option value="router">Router</option>
+                                    <option value="switch">Switch</option>
+                                </select>
+                                </span>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                <label for="deviceName">Device Name: </label>
+                                <span stlye="width: 100%;">
+                                    <input type="text" class="form-control ml-3" id="deviceName" name="deviceName" aria-describedby="deviceName" placeholder="Device Name" 
+                                    {% if device.name: %}
+                                    value="{{device.name}}" 
+                                    {% endif %}>
+                                    </input>
+                                </span>
+                                </div>
+                                <small class="form-text text-muted">
+                                        The device name needs to be unique, it will be used to identify it in the future.
+                                </small>
+                            </div>
+                            <div class="form-group">
+                                <label for="deviceDescription">Description: <span class="badge">Optional</span></label>
+                                <textarea class="form-control" id="deviceDescription" name="deviceDescription" aria-describedby="deviceDescription">{% if device.descrition != 'None': %}{{device.description}}{% endif %}</textarea>
+                                <small class="form-text text-muted">
+                                    What is it use for? Where it's located?
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card-title">SSH Connection</div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="deviceHost">Host (IP/domain): </label>
+                                    <span stlye="width: 100%;">
+                                        <input type="text" class="form-control ml-3" id="deviceHost" name="deviceHost" aria-describedby="deviceHost" placeholder="host" required
+                                            {% if device.host: %}
+                                            value="{{device.host}}" 
+                                            {% endif %}>
+                                        </input>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="deviceUser">Username: </label>
+                                    <span stlye="width: 100%;">
+                                        <input type="text" class="form-control ml-3" id="deviceUser" name="deviceUser" aria-describedby="deviceUser" placeholder="user" required
+                                        {% if device.ssh_username: %}
+                                        value="{{device.ssh_username}}" 
+                                        {% endif %} required>
+                                        </input>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="form-inline">
+                                    <label for="devicePassword">Password: </label>
+                                        <input type="password" class="form-control ml-3" id="devicePassword" name="devicePassword" aria-describedby="devicePassword" placeholder="password" required>
+                                        </input>
+                                </div>
+                            </div>
+                            <button type="button" onclick="tryDeviceConnectionFromForm()" class="btn btn-sm btn-primary"><i class="mdi mdi-chevron-double-right"></i> Check Connection</button> Connection Status: <span id="connectionStatus">-</span>
+                        </div>
+                        
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <div class="float-right">
+                            <a href="{{url_for('devices', id=device.id)}}" class="btn btn-secondary">Cancel</a>
+                            <button form="deleteDevice" type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-success">Save</button>
+                        </div>
+                        </div>
+                </div>
+            </div>                          
+        </form>
+    </div>
+</div>
+<form id="deleteDevice" action="{{url_for('delete_device', id=device.id)}}" method="POST">
+</form>
+<script src="{{url_for('static', filename='js/device.js')}}"></script>
+{% endblock %}
