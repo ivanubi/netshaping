@@ -1,3 +1,9 @@
 venv
 __pycache__
 .vscode
+database/database.db
+celerybeat-schedule
+dump.rdb
+celerybeat-schedule
+dump.rdb
+*.pyc
