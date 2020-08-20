@@ -33,7 +33,7 @@ celery.conf.beat_schedule = {
     },
         "check-active-devices": {
         "task": "app.check_active_devices",
-        "schedule": 60.0
+        "schedule": 30.0
     }
 }
 app.config.update(DEBUG=True, SECRET_KEY=b"ACEDEJEADEJE")
@@ -66,7 +66,6 @@ def policy_stats():
                         drop_rate = int(stats['drop_rate'])
                     )
                 )
-            print(interface.policy_stats)
             interface.update()
 
 @celery.task
