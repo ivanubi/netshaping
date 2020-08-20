@@ -57,11 +57,25 @@ function setPolicyToInt(device_id) {
                 } else {
                     html_alert = `
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>Error!</strong> ${response.response}.
+                    <strong>Error!</strong> ${response.response}.`
+                    if (response.commands) {
+                        document.getElementById(
+                            "commandsModalBody"
+                        ).innerHTML = response.commands.toString().replace(/,/g, "<br>");
+                        html_alert += 
+                            `
+                            <a type="button" data-toggle="modal" class="btn btn-link btn-sm" data-target="#commandsModal">
+                            See the commands that NetShaping tried to configure
+                            </a>
+                            `
+                    }
+                    html_alert +=
+                    `
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
-                    </div>`;
+                    </div>
+                    `;
                 }
                 document.getElementById("alert").innerHTML = html_alert;
                 submitButton.innerHTML = `Send Settings to the Interface`;
