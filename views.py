@@ -9,7 +9,7 @@ import json
 
 from models import *
 from flask_login import login_required, logout_user, current_user, login_user
-from datetime import date
+from datetime import date, datetime, timedelta
 from sqlalchemy import func
 
 
@@ -596,12 +596,13 @@ def get_interfaces(id=None):
         interface = Interface.query.get(id)
         class_names = []
         
-        for stat in Stat.query.filter(func.date(Stat.created_on) == date.today(), Stat.interface_id == interface.id).group_by(Stat.class_name).all():
+        since = datetime.now() - timedelta(hours=1)
+        for stat in Stat.query.filter(Stat.created_on >= since, Stat.interface_id == interface.id).group_by(Stat.class_name).all():
             class_names.append(stat.class_name)
 
         data = {}
         for class_name in class_names:
-            stats = Stat.query.filter(func.date(Stat.created_on) == date.today(), Stat.interface_id == interface.id, Stat.class_name==class_name).order_by(-Stat.id).limit(50).all()
+            stats = Stat.query.filter(Stat.created_on >= since, Stat.interface_id == interface.id, Stat.class_name==class_name).order_by(-Stat.id).limit(50).all()
             stats.reverse()
             data[class_name] = {}
             data[class_name]['dates'] = []

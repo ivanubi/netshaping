@@ -98,10 +98,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <canvas id="myChart"></canvas>
-                        </div>
+                    <div id="charts">
+                        <span id="loading" style="margin-left: 45%;"><img src="/static/images/loading4.svg"  width="30"></img><br>
+                        </span>
                     </div>
                     <br />
                     <div class="card-footer bg-transparent">
@@ -118,44 +117,215 @@
         </form>
     </div>
 </div>
+<script src="https://momentjs.com/downloads/moment.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+
+
 <script>
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: 'Blue no mater who',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 3
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            }
+    var getJSON = function(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'json';
+        xhr.onload = function() {
+        var status = xhr.status;
+        if (status === 200) {
+            callback(null, xhr.response);
+        } else {
+            callback(status, xhr.response);
         }
-    });
-    </script>
+        };
+        xhr.send();
+    };
+    var obj = {}
+    var firstTime = true
+    var update_charts = function() {
+        getJSON('/api/interfaces/{{interface.id}}',
+        function(err, data) {
+            if (err !== null) {
+                document.getElementById('loading').remove()
+            } else {
+                for (const [key, stat] of Object.entries(data.data)) {
+                    if (firstTime == true) {
+                        html = `
+                        <div>
+                            <canvas id="${key}"></canvas>
+                        </div>
+                        <br>
+                        <div>
+                            <canvas id="${key}speed"></canvas>
+                        </div>
+                        `
+                        document.getElementById('charts').insertAdjacentHTML("beforeend", html);
+                    }
+                    
+                    var data1 = [], data2 = [], data3 = []
+
+                    for (i = 0; i < stat.dates.length; i++) {
+                        data1.push({
+                            t: new Date(stat.dates[i]),
+                            y: stat.offered_rates[i]/1000,
+                        })  
+                        data2.push({
+                            t: new Date(stat.dates[i]),
+                            y: stat.drop_rates[i]/1000,
+                        })
+                        data3.push({
+                            t: new Date(stat.dates[i]),
+                            y: (stat.offered_rates[i]/1000.0)/30.0,
+                        })
+                    } 
+                    if (firstTime == true) {
+                        var ctx = document.getElementById(key).getContext('2d');
+                        var cty = document.getElementById(key+"speed").getContext('2d');
+
+                        obj[key] = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                datasets: 
+                                [{ 
+                                    data: data1,
+                                    label: "OFFERED RATE (last 30 seconds)",
+                                    borderColor: "green",
+                                    fill: false}, 
+                                    { 
+                                    data: data2,
+                                    label: "DROP RATE (last 30 seconds)",
+                                    borderColor: "white",
+                                    fill: false
+                                }]
+                            },
+                            options: {
+                                tooltips: {
+                                    enabled: true,
+                                    intersect: false,
+                                },
+                                title: {
+                                    display: true,
+                                    text: `Class: ${key}`,
+                                    fontColor: 'white'
+                                },
+                                legend: {
+                                    labels: {
+                                        fontColor: 'white'
+                                    }
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Time',
+                                            fontColor: 'white',
+                                        },
+                                        type: 'time',
+                                        time: {
+                                            unit: 'second',
+                                            stepSize: 10,
+                                        }, 
+                                    }],
+                                    yAxes: [{
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Matched Traffic',
+                                            fontColor: 'white'
+                                        },
+                                        ticks: {
+                                            beginAtZero: true,
+                                            fontColor: 'white',
+                                            callback: function(value, index, values) {
+                                                return value + 'Kb';
+                                            }
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+
+                        obj[key+"speed"] = new Chart(cty, {
+                            type: 'line',
+                            data: {
+                                datasets: 
+                                [{ 
+                                    data: data3,
+                                    label: "Average Speed (last 30 seconds)",
+                                    borderColor: "green",
+                                    fill: false}]
+                            },
+                            options: {
+                                tooltips: {
+                                    enabled: true,
+                                    intersect: false,
+                                },
+                                title: {
+                                    display: true,
+                                    text: `Class: ${key}`,
+                                    fontColor: 'white'
+                                },
+                                legend: {
+                                    labels: {
+                                        fontColor: 'white'
+                                    }
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Time',
+                                            fontColor: 'white',
+                                        },
+                                        type: 'time',
+                                        time: {
+                                            unit: 'second',
+                                            stepSize: 10,
+                                        }, 
+                                    }],
+                                    yAxes: [{
+                                        scaleLabel: {
+                                            display: true,
+                                            labelString: 'Speed',
+                                            fontColor: 'white'
+                                        },
+                                        ticks: {
+                                            beginAtZero: true,
+                                            fontColor: 'white',
+                                            callback: function(value, index, values) {
+                                                return value + 'Kbps';
+                                            }
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    } else {
+                        obj[key].data.datasets = [{
+                            data: data1,
+                            label: "OFFERED RATE (last 30 seconds)",
+                            borderColor: "green",
+                            fill: false}, 
+                            { 
+                            data: data2,
+                            label: "DROP RATE (last 30 seconds)",
+                            borderColor: "white",
+                            fill: false
+                        }]
+                        obj[key].update()
+
+                        obj[key+"speed"].data.datasets = [{
+                            data: data3,
+                            label: "Average Speed (last 30 seconds)",
+                            borderColor: "green",
+                            fill: false
+                        }]
+                        obj[key+"speed"].update()
+                    }
+                }
+            }
+            if (firstTime == true){
+                document.getElementById('loading').remove()
+            }
+            firstTime = false
+        })
+    }
+    update_charts()
+    setInterval(update_charts, 40000)
+</script>
 {% endblock %}
