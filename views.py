@@ -9,6 +9,8 @@ import json
 
 from models import *
 from flask_login import login_required, logout_user, current_user, login_user
+from datetime import date
+from sqlalchemy import func
 
 
 @app.route("/login/", methods=["GET", "POST"])
@@ -266,8 +268,17 @@ def update_interface(id=None):
                 password=interface.device.ssh_password,
             )
             connection.generate_policy_to_int(interface.policy, interface)
-            interface.update()
-            return redirect(url_for("interfaces", id=interface.id))
+            if connection.check_policy_interface(interface.name, interface.policy.name) == True:
+                interface.update()
+                return redirect(url_for("interfaces", id=interface.id))
+            else:
+                return render_template(
+                    "interfaces/edit.html",
+                    interface=interface,
+                    error="This policy is INCOMPATIBLE with this interface. Check your policy and interface settings then try again.",
+                    title=title,
+                    current_user=current_user,
+                )
     else:
         return render_template(
             "interfaces/edit.html",
@@ -578,6 +589,42 @@ def users(id=None):
 
 """API"""
 
+@app.route("/api/interfaces", methods=["GET"])
+@app.route("/api/interfaces/<id>", methods=["GET"])
+def get_interfaces(id=None):
+    if Interface.query.get(id):
+        interface = Interface.query.get(id)
+        class_names = []
+        
+        for stat in Stat.query.filter(func.date(Stat.created_on) == date.today(), Stat.interface_id == interface.id).group_by(Stat.class_name).all():
+            class_names.append(stat.class_name)
+
+        data = {}
+        for class_name in class_names:
+            stats = Stat.query.filter(func.date(Stat.created_on) == date.today(), Stat.interface_id == interface.id, Stat.class_name==class_name).order_by(-Stat.id).limit(50).all()
+            stats.reverse()
+            data[class_name] = {}
+            data[class_name]['dates'] = []
+            data[class_name]['offered_rates'] = []
+            data[class_name]['drop_rates'] = []
+            for stat in stats:
+                data[class_name]['dates'].append(stat.created_on)
+                data[class_name]['offered_rates'].append(stat.offered_rate)
+                data[class_name]['drop_rates'].append(stat.drop_rate) 
+        
+
+        return jsonify({
+            "id": interface.id, 
+            "name": interface.name, 
+            "data": data
+        })
+    elif id:
+        return jsonify({"error": "404", "response": "Interface not found"})
+    else:
+        interfaces_list = []
+        for interface in Interface.query.all():
+            interfaces_list.append({"id": interface.id, "name": interface.name})
+        return jsonify(interfaces)
 
 @app.route("/api/services", methods=["GET"])
 @app.route("/api/services/<id>", methods=["GET"])
@@ -636,7 +683,8 @@ def api_update_interface(id=None):
                 password=interface.device.ssh_password,
             )
             commands = connection.generate_policy_to_int(interface.policy, interface)
-            if commands:
+            was_succesful = connection.check_policy_interface(interface.name, interface.policy.name)
+            if commands and was_succesful == True:
                 interface.update()
                 return jsonify(
                     {
@@ -645,19 +693,16 @@ def api_update_interface(id=None):
                         "commands": commands,
                     }
                 )
+            elif commands:
+                return jsonify(
+                    {
+                        "status": "error",
+                        "response": "This policy and interface are incompatible. Check your interface and policy settings then try again",
+                        "commands": commands,
+                    }
+                )
             else:
-                return jsonify({"status": "error", "response": "An issue was raised"})
-
-    except:
-        return jsonify({"status": "error", "response": "An issue was raised"})
-
-def setup_db():
-    user = User(name='Jania Corona', email='jania@netshaping.com')
-    user.set_password('cisco')
-    user.create()
-
-    protocols = ['aarp', 'appletalk', 'arp', 'bgp', 'bridge', 'bstun', 'cdp', 'cdp', 
-    'citrix', 'clns', 'dhcp', 'dns', 'egp', 'eigrp', 'ftp', 'h323', 'http', 
-    'icmp', 'ip', 'ipv6', 'pop3', 'rtp', 'socks', 'smtp', 'sip', 'ssh', 'telnet']
-    for protocol in protocols:
-        Service(name=protocol, type='protocol', match_protocol=protocol).create()
+                return jsonify(
+                    {"status": "error", "response": "The connection to the router was lost."})
+    except Exception as error:
+        return jsonify({"status": "error", "response": "{}".format(error)})
