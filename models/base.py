@@ -3,6 +3,7 @@ import pathlib
 
 sys.path.append(str(pathlib.Path().absolute()).replace("/models", ""))
 
+from datetime import datetime
 from app import db
 
 
@@ -17,6 +18,7 @@ class BaseModel(db.Model):
         db.session.commit()
 
     def create(self):
+        self.created_on = datetime.now()
         db.session.add(self)
         db.session.commit()
 

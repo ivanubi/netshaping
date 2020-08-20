@@ -16,8 +16,10 @@ class Device(BaseModel):
     host = db.Column(db.String(200), unique=True)
     ssh_username = db.Column(db.String(40))
     ssh_password = db.Column(db.String(150))
+    state = db.Column(db.String(40))
 
     interfaces = db.relationship("Interface", back_populates="device", cascade="all")
+    logs = db.relationship("Log", back_populates="device", cascade="all")
 
     def update_interfaces(self):
         has_added_new_one = False
@@ -28,9 +30,7 @@ class Device(BaseModel):
             interfaces_name = list(connection.interfaces().keys())
             print(interfaces_name)
             for interface_name in interfaces_name:
-                if not Interface.query.filter_by(
-                    name=interface_name, device_id=self.id
-                ).scalar():
+                if not Interface.query.filter_by(device_id=self.id, name=interface_name).scalar():
                     self.interfaces.append(Interface(name=interface_name))
                     has_added_new_one = True
             if has_added_new_one:
@@ -44,7 +44,7 @@ class Device(BaseModel):
             return "failed_authentication"
 
     def validate(self):
-        if self.__validate_ip(self.host) == False:
+        if self.host and self.__validate_ip(self.host) == False:
             return "Invalid IP"
         else:
             return None

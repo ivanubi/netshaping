@@ -15,13 +15,14 @@ class Interface(BaseModel):
     policy_id = db.Column(db.Integer, db.ForeignKey("policy.id"))
     device_id = db.Column(db.Integer, db.ForeignKey("device.id"), nullable=False)
 
+    policy_stats = db.relationship("Stat", back_populates="interface", cascade="all")
     policy = db.relationship("Policy", back_populates="interfaces", uselist=False)
     device = db.relationship("Device", back_populates="interfaces", uselist=False)
 
     def validate(self):
-        if len(self.description) > 2000:
+        if self.description and len(self.description) > 2000:
             return "Too long description"
-        elif (self.bandwidth.isdigit() == False) or (int(self.bandwidth) < 1):
+        elif self.bandwidth and (self.bandwidth.isdigit() == False) or (int(self.bandwidth) < 1):
             return "Invalid bandwidth"
 
     def __repr__(self):

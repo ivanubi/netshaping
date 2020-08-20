@@ -15,9 +15,9 @@ class Policy(BaseModel):
     interfaces = db.relationship("Interface", back_populates="policy")
 
     def validate(self):
-        if len(self.name) > 80:
+        if self.name and len(self.name) > 80:
             return "name is too large"
-        elif len(self.description) > 2000:
+        elif self.description and len(self.description) > 2000:
             return "description is too large"
         else:
             return None
