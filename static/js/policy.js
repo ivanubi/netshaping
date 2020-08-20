@@ -123,7 +123,7 @@ function handleForm() {
         service = {
             service_id: document.getElementsByName(`services[${i}][service_id]`)[0].value,
             min_bandwidth: document.getElementsByName(`services[${i}][min_bandwidth]`)[0].value,
-            max_bandwidth: document.getElementsByName(`services[${i}][hard_bandwidth]`)[0].value,
+            max_bandwidth: Math.round(document.getElementsByName(`services[${i}][hard_bandwidth]`)[0].value/1000),
             mark_dscp: document.getElementsByName(`services[${i}][mark_dscp]`)[0].value,
         };
         policy.services.push(service);
