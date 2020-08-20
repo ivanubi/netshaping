@@ -25,6 +25,28 @@ class Connection:
     def running_config(self):
         return self.send_cmd("sh running-config")
 
+    def stats_policy_interface(self, interface):
+        stats = {}
+        try:
+            show = self.send_cmd("sh policy-map interface {}".format(interface)).split('\n')
+            for line in show:
+                if 'Service-policy output' in line:
+                    policy_name = line.replace('Service-policy output: ', '').replace(' ', '')
+                    stats['output_policy'] = policy_name
+                    stats['classes'] = {}
+                if 'Class-map:' in line:
+                    class_name = line.replace('Class-map: ','').replace('(match-all)','').replace('(match-any)', '').replace(' ', '')
+                    service = class_name.replace(policy_name + '-', '')
+                    stats['classes'][service] = {}
+                    stats['classes'][service]['class_name'] = class_name
+                if 'offered rate' in line:
+                    stats['classes'][service]['offered_rate'] = re.search("offered rate (.*?) bps", line).group(1).replace(" ", "")
+                    stats['classes'][service]['drop_rate'] = re.search("drop rate (.*?) bps", line).group(1).replace(" ", "")
+            stats['success'] = True
+        except:
+            stats['success'] = False
+        return stats
+
     def create_acl(self, acl_name, source_ip):
         return self.send_config_cmds(
             [
@@ -112,6 +134,7 @@ class Connection:
             [
                 "interface {}".format(interface),
                 "service-policy {} {}".format(type, policy_name),
+                "load-interval 30"
             ]
         )
 
@@ -185,6 +208,7 @@ class Connection:
 
             commands.append("interface {}".format(interface.name))
             commands.append("bandwidth {}".format(interface.bandwidth))
+            commands.append("load-interval 30")
             current_policy_name = self.get_current_policy_name(
                 interface.name, type=type
             )
@@ -200,6 +224,14 @@ class Connection:
         except:
             return None
 
+    def check_policy_interface(self, interface_name, policy_name):
+        try:
+            for config_line in self.interfaces()[interface_name]:
+                if policy_name in config_line:
+                    return True
+        finally:
+            return False
+
     def send_config_cmds(self, commands):
         try:
             connection = Netmiko(
@@ -207,7 +239,7 @@ class Connection:
                 username=self.username,
                 password=self.password,
                 device_type=self.device_type,
-                timeout=100,
+                timeout=150,
             )
             return connection.send_config_set(commands)
         except NetmikoAuthenticationException:
@@ -237,14 +269,13 @@ class Connection:
                 username=self.username,
                 password=self.password,
                 device_type=self.device_type,
-                timeout=10,
+                timeout=20,
             )
             return connection.send_command(command)
         except NetmikoAuthenticationException:
             return "failed_authentication"
         except:
             return "timeout"
-
 
 def _ip_list_to_str(ip_list):
     return str(ip_list).replace("[", "").replace("]", "").replace(",", " ")
