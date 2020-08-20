@@ -66,7 +66,7 @@
                                         <div class="form-inline mt-1 ml-3">
                                             <label class="mr-2">- Minimum Bandwidth:</label>
                                                 <input name="services[{{loop.index0}}][min_bandwidth]"
-                                                 class="form-control" type="number" min="0" max="20000000"
+                                                 class="form-control" type="number" min="8000" max="20000000"
                                                  value="{{service_settings.min_bandwidth}}"
                                                 onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"></input>
                                                 <div class="input-group-append">
@@ -77,7 +77,7 @@
                                             <label class="mr-2">- Shape Bandwidth:</label>
                                             <input name="services[{{loop.index0}}][hard_bandwidth]" class="form-control" 
                                             value="{{service_settings.max_bandwidth}}"
-                                            type="number" min="0" max="2000000"
+                                            type="number" min="8000" max="2000000"
                                             onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"></input>
                                             <div class="input-group-append">
                                                 <span class="input-group-text">kbps</span>
