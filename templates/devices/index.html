@@ -28,34 +28,81 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="card-group">
-                {% if not devices: %}
-                <span style="margin-left: 400px; margin-top: 150px;" class="h4 text-center">
-                    0 devices found</span
-                >
-                {% endif %} {% for device in devices: %}
-                <div class="col-sm-2">
-                    <div class="card">
-                        <img
-                            class="card-img-top img-fluid"
-                            src="https://www.datacenterknowledge.com/sites/datacenterknowledge.com/files/styles/article_featured_standard/public/Data-Center-Racks_0.jpg?itok=LWSwU7vl"
-                            alt="Card image cap"
-                        />
-                        <div class="card-body">
-                            <div class="card-text text-center">
-                                {{device.name}}
-                            </div>
-                            <a
-                                href="{{url_for('devices', id=device.id)}}"
-                                class="stretched-link"
-                            ></a>
-                        </div>
-                    </div>
-                </div>
+        {% if not devices: %}
+        <span style="margin-left: 400px; margin-top: 150px;" class="h4 text-center">
+            0 devices found</span
+        >
+        {% else: %} 
+        <div class="card border border-dark rounded row">
+            <table class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Device Type</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">State</th>
+                    <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for device in devices: %}
+                <tr>
+                    <th scope="row">{{device.id}}</th>
+                    <td>{{device.device_type}}</td>
+                    <td>{{device.name}}</td>
+                    <td id="deviceState{{device.id}}">
+                        {% if device.state == 'active': %}
+                        <span class="badge badge-success">CONNECTED</span>
+                        {% else: %}
+                        <span class="badge badge-danger">DISCONNECTED</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a class="btn btn-sm btn-info" href="{{url_for('devices', id=device.id)}}" class="stretched-link">Manage</a>
+                    </td>
+                </tr>
                 {% endfor %}
-            </div>
+                </tbody>
+            </table>
         </div>
+        {% endif %} 
     </div>
 </div>
+
+<script>
+    var getJSON = function(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'json';
+        xhr.onload = function() {
+            var status = xhr.status;
+            if (status === 200) {
+                callback(null, xhr.response);
+            } else {
+                callback(status, xhr.response);
+            }
+        };
+        xhr.send();
+    };
+    var update_devices_state = function() {
+        getJSON('/api/devices/state',
+            function(err, data) {
+                if (err !== null) {
+                } else {
+                    for (var i = 0; i < data.length; i++) {
+                        console.log(data[i])
+                        if (data[i].state == "active") {
+                            document.getElementById("deviceState"+data[i].id).innerHTML =
+                            `<span class="badge badge-success">CONNECTED</span>` 
+                        } else {
+                            document.getElementById("deviceState"+data[i].id).innerHTML =
+                            `<span class="badge badge-danger">DISCONNECTED</span>`
+                        }
+                    }
+                }
+            })
+        }
+    update_devices_state()
+    setInterval(update_devices_state, 30000)  
+</script>
 {% endblock %}
