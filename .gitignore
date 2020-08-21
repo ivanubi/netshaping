@@ -7,3 +7,4 @@ dump.rdb
 celerybeat-schedule
 dump.rdb
 *.pyc
+celerybeat.pid
