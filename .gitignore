@@ -1,7 +1,7 @@
 venv
 __pycache__
 .vscode
-database/database.db
+database/*
 celerybeat-schedule
 dump.rdb
 celerybeat-schedule
