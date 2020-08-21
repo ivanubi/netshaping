@@ -643,6 +643,21 @@ def get_services(id=None):
         return jsonify(services_list)
 
 
+@app.route("/api/devices/state", methods=["GET"])
+@app.route("/api/devices/<id>/state", methods=["GET"])
+def get_devices_state(id=None):
+    if Device.query.get(id):
+        device = Device.query.get(id)
+
+        return jsonify({"id": device.id, "state": device.state})
+    elif id:
+        return jsonify({"error": "404", "response": "Device not found"})
+    else:
+        devices_state_list = []
+        for device in Device.query.all():
+            devices_state_list.append({"id": device.id, "state": device.state})
+        return jsonify(devices_state_list)
+
 @app.route("/api/policies", methods=["GET"])
 @app.route("/api/policies/<id>", methods=["GET"])
 def get_policies(id=None):
