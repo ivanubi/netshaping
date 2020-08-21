@@ -241,7 +241,9 @@ class Connection:
                 device_type=self.device_type,
                 timeout=150,
             )
-            return connection.send_config_set(commands)
+            response = connection.send_config_set(commands)
+            connection.disconnect()
+            return response
         except NetmikoAuthenticationException:
             return "failed authentication"
         except:
@@ -249,13 +251,14 @@ class Connection:
 
     def try_connection(self):
         try:
-            Netmiko(
+            connection = Netmiko(
                 host=self.host,
                 username=self.username,
                 password=self.password,
                 device_type=self.device_type,
                 timeout=10,
             )
+            connection.disconnect()
             return "success"
         except NetmikoAuthenticationException:
             return "failed_authentication"
@@ -271,7 +274,9 @@ class Connection:
                 device_type=self.device_type,
                 timeout=20,
             )
-            return connection.send_command(command)
+            response = connection.send_command(command)
+            connection.disconnect()
+            return response
         except NetmikoAuthenticationException:
             return "failed_authentication"
         except:
