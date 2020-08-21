@@ -1,10 +1,11 @@
 venv
 __pycache__
 .vscode
-database/*
+database
 celerybeat-schedule
 dump.rdb
 celerybeat-schedule
 dump.rdb
 *.pyc
 celerybeat.pid
+task.txt
