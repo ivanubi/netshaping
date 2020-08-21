@@ -201,7 +201,7 @@ class Connection:
                     )
                 if service_settings.max_bandwidth:
                     commands.append(
-                        "shape average {}".format(service_settings.max_bandwidth)
+                        "shape average {}".format(service_settings.max_bandwidth*1000)
                     )
                 if service_settings.mark_dscp:
                     commands.append("set dscp {}".format(service_settings.mark_dscp))
@@ -225,12 +225,10 @@ class Connection:
             return None
 
     def check_policy_interface(self, interface_name, policy_name):
-        try:
-            for config_line in self.interfaces()[interface_name]:
-                if policy_name in config_line:
-                    return True
-        finally:
-            return False
+        for config_line in self.interfaces()[interface_name]:
+            if policy_name in config_line:
+                return True
+        return False
 
     def send_config_cmds(self, commands):
         try:
