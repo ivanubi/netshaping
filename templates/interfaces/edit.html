@@ -64,7 +64,7 @@
                             <div class="card-title">Applied Policy</div>
                             <div class="form-group">
                                 <div class="form-inline">
-                                    <label for="policy_id">Policy: </label>
+                                    <label for="policy_id">Output Policy: </label>
                                     <div class="ml-2">
                                         <div>
                                             <select class="form-control" id="policy_id" name="policy_id" id="policy_id" required>
@@ -79,6 +79,15 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <div class="card-title" for="scheduleCheck">Schedules</div>
+                                <div onclick="deleteSchedule()" class="btn btn-sm btn-danger">DELETE -</div>
+                                <div onclick="addSchedule()" class="btn btn-sm btn-info text-dark">ADD +</div>
+                                <div id="schedules">
+                        
+                                </div>
+                            </div>
+                           
                         </div>
                     </div>
                     <br>
