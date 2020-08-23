@@ -16,6 +16,7 @@ class Interface(BaseModel):
     device_id = db.Column(db.Integer, db.ForeignKey("device.id"), nullable=False)
 
     policy_stats = db.relationship("Stat", back_populates="interface", cascade="all")
+    policy_schedules = db.relationship("InterfacePolicySchedule", back_populates="interface", cascade="all")
     policy = db.relationship("Policy", back_populates="interfaces", uselist=False)
     device = db.relationship("Device", back_populates="interfaces", uselist=False)
 
@@ -33,3 +34,17 @@ class Interface(BaseModel):
             self.description = description
         if bandwidth and self.bandwidth != bandwidth:
             self.bandwidth = bandwidth
+
+class InterfacePolicySchedule(BaseModel):
+    id = db.Column(db.Integer primary_key=True)
+    interface_id = db.Column(db.Integer, db.ForeignKey("interface.id"), nullable=False)
+    policy_id = db.Column(db.Integer, db.ForeignKey("policy.id"), nullable=False)
+    day = db.Column(db.Integer, default=1)
+    time = db.Column(db.Time)
+
+    interface = db.relationship("Interface", back_populates="policy_schedules")
+
+    def create(self):
+        self.interface = Interface.query.get(self.interface_id)
+        db.session.add(self)
+        db.session.commit()
