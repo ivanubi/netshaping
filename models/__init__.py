@@ -1,6 +1,7 @@
 import sys
 import pathlib
-sys.path.append(str(pathlib.Path().absolute()).replace('/models',''))
+
+sys.path.append(str(pathlib.Path().absolute()).replace("/models", ""))
 
 from net import Connection
 

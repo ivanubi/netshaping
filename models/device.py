@@ -1,6 +1,7 @@
 import sys
 import pathlib
-sys.path.append(str(pathlib.Path().absolute()).replace('/models',''))
+
+sys.path.append(str(pathlib.Path().absolute()).replace("/models", ""))
 
 from .base import BaseModel
 from . import Connection, Interface
@@ -30,7 +31,9 @@ class Device(BaseModel):
             interfaces_name = list(connection.interfaces().keys())
             print(interfaces_name)
             for interface_name in interfaces_name:
-                if not Interface.query.filter_by(device_id=self.id, name=interface_name).scalar():
+                if not Interface.query.filter_by(
+                    device_id=self.id, name=interface_name
+                ).scalar():
                     self.interfaces.append(Interface(name=interface_name))
                     has_added_new_one = True
             if has_added_new_one:

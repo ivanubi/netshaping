@@ -268,7 +268,10 @@ def update_interface(id=None):
                 password=interface.device.ssh_password,
             )
             connection.generate_policy_to_int(interface.policy, interface)
-            if connection.check_policy_interface(interface.name, interface.policy.name) == True:
+            if (
+                connection.check_policy_interface(interface.name, interface.policy.name)
+                == True
+            ):
                 interface.update()
                 return redirect(url_for("interfaces", id=interface.id))
             else:
@@ -354,7 +357,9 @@ def new_service():
             match_dscp=request.form["serviceDSCPsValues"].replace(" ", "")
             if request.form["serviceDSCPsValues"]
             else None,
-            match_protocol=request.form["protocol"].replace(" ", "") if request.form["protocol"] else None
+            match_protocol=request.form["protocol"].replace(" ", "")
+            if request.form["protocol"]
+            else None,
         )
         error = new_service.validate()
         if error:
@@ -589,36 +594,47 @@ def users(id=None):
 
 """API"""
 
+
 @app.route("/api/interfaces", methods=["GET"])
 @app.route("/api/interfaces/<id>", methods=["GET"])
 def get_interfaces(id=None):
     if Interface.query.get(id):
         interface = Interface.query.get(id)
         class_names = []
-        
+
         since = datetime.now() - timedelta(hours=1)
-        for stat in Stat.query.filter(Stat.created_on >= since, Stat.interface_id == interface.id).group_by(Stat.class_name).all():
+        for stat in (
+            Stat.query.filter(
+                Stat.created_on >= since, Stat.interface_id == interface.id
+            )
+            .group_by(Stat.class_name)
+            .all()
+        ):
             class_names.append(stat.class_name)
 
         data = {}
         for class_name in class_names:
-            stats = Stat.query.filter(Stat.created_on >= since, Stat.interface_id == interface.id, Stat.class_name==class_name).order_by(-Stat.id).limit(50).all()
+            stats = (
+                Stat.query.filter(
+                    Stat.created_on >= since,
+                    Stat.interface_id == interface.id,
+                    Stat.class_name == class_name,
+                )
+                .order_by(-Stat.id)
+                .limit(50)
+                .all()
+            )
             stats.reverse()
             data[class_name] = {}
-            data[class_name]['dates'] = []
-            data[class_name]['offered_rates'] = []
-            data[class_name]['drop_rates'] = []
+            data[class_name]["dates"] = []
+            data[class_name]["offered_rates"] = []
+            data[class_name]["drop_rates"] = []
             for stat in stats:
-                data[class_name]['dates'].append(stat.created_on)
-                data[class_name]['offered_rates'].append(stat.offered_rate)
-                data[class_name]['drop_rates'].append(stat.drop_rate) 
-        
+                data[class_name]["dates"].append(stat.created_on)
+                data[class_name]["offered_rates"].append(stat.offered_rate)
+                data[class_name]["drop_rates"].append(stat.drop_rate)
 
-        return jsonify({
-            "id": interface.id, 
-            "name": interface.name, 
-            "data": data
-        })
+        return jsonify({"id": interface.id, "name": interface.name, "data": data})
     elif id:
         return jsonify({"error": "404", "response": "Interface not found"})
     else:
@@ -626,6 +642,7 @@ def get_interfaces(id=None):
         for interface in Interface.query.all():
             interfaces_list.append({"id": interface.id, "name": interface.name})
         return jsonify(interfaces)
+
 
 @app.route("/api/services", methods=["GET"])
 @app.route("/api/services/<id>", methods=["GET"])
@@ -658,6 +675,7 @@ def get_devices_state(id=None):
             devices_state_list.append({"id": device.id, "state": device.state})
         return jsonify(devices_state_list)
 
+
 @app.route("/api/policies", methods=["GET"])
 @app.route("/api/policies/<id>", methods=["GET"])
 def get_policies(id=None):
@@ -679,14 +697,14 @@ def api_update_interface(id=None):
     try:
         payload = request.get_json()
         interface = Interface.query.get(id)
-        if payload['policy_schedules']:
+        if payload["policy_schedules"]:
             for schedule in payload["policy_schedules"]:
                 new = InterfacePolicySchedule(
-                        policy_id=schedule['policy_id'],
-                        interface_id=interface.id,
-                        time=schedule['time'] if schedule['time'] else None,
-                        day=schedule['day'] if schedule['day'] else None
-                    )
+                    policy_id=schedule["policy_id"],
+                    interface_id=interface.id,
+                    time=schedule["time"] if schedule["time"] else None,
+                    day=schedule["day"] if schedule["day"] else None,
+                )
                 interface.policy_schedules.append(schedule)
         interface.set(
             description=payload["description"], bandwidth=payload["bandwidth"]
@@ -708,7 +726,9 @@ def api_update_interface(id=None):
                 password=interface.device.ssh_password,
             )
             commands = connection.generate_policy_to_int(interface.policy, interface)
-            was_succesful = connection.check_policy_interface(interface.name, interface.policy.name)
+            was_succesful = connection.check_policy_interface(
+                interface.name, interface.policy.name
+            )
             if commands and was_succesful == True:
                 interface.update()
                 return jsonify(
@@ -728,6 +748,10 @@ def api_update_interface(id=None):
                 )
             else:
                 return jsonify(
-                    {"status": "error", "response": "The connection to the router was lost."})
+                    {
+                        "status": "error",
+                        "response": "The connection to the router was lost.",
+                    }
+                )
     except Exception as error:
         return jsonify({"status": "error", "response": "{}".format(error)})

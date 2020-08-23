@@ -15,7 +15,9 @@ class Stat(BaseModel):
     policy_name = db.Column(db.String(80))
     class_name = db.Column(db.String(80))
     interface_id = db.Column(db.Integer, db.ForeignKey("interface.id"), nullable=False)
-    interface = db.relationship("Interface", back_populates="policy_stats", uselist=False)
+    interface = db.relationship(
+        "Interface", back_populates="policy_stats", uselist=False
+    )
 
     def __repr__(self):
         return "<Stat %r - ID %r>" % (self.name, self.id)

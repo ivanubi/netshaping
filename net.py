@@ -28,23 +28,38 @@ class Connection:
     def stats_policy_interface(self, interface):
         stats = {}
         try:
-            show = self.send_cmd("sh policy-map interface {}".format(interface)).split('\n')
+            show = self.send_cmd("sh policy-map interface {}".format(interface)).split(
+                "\n"
+            )
             for line in show:
-                if 'Service-policy output' in line:
-                    policy_name = line.replace('Service-policy output: ', '').replace(' ', '')
-                    stats['output_policy'] = policy_name
-                    stats['classes'] = {}
-                if 'Class-map:' in line:
-                    class_name = line.replace('Class-map: ','').replace('(match-all)','').replace('(match-any)', '').replace(' ', '')
-                    service = class_name.replace(policy_name + '-', '')
-                    stats['classes'][service] = {}
-                    stats['classes'][service]['class_name'] = class_name
-                if 'offered rate' in line:
-                    stats['classes'][service]['offered_rate'] = re.search("offered rate (.*?) bps", line).group(1).replace(" ", "")
-                    stats['classes'][service]['drop_rate'] = re.search("drop rate (.*?) bps", line).group(1).replace(" ", "")
-            stats['success'] = True
+                if "Service-policy output" in line:
+                    policy_name = line.replace("Service-policy output: ", "").replace(
+                        " ", ""
+                    )
+                    stats["output_policy"] = policy_name
+                    stats["classes"] = {}
+                if "Class-map:" in line:
+                    class_name = (
+                        line.replace("Class-map: ", "")
+                        .replace("(match-all)", "")
+                        .replace("(match-any)", "")
+                        .replace(" ", "")
+                    )
+                    service = class_name.replace(policy_name + "-", "")
+                    stats["classes"][service] = {}
+                    stats["classes"][service]["class_name"] = class_name
+                if "offered rate" in line:
+                    stats["classes"][service]["offered_rate"] = (
+                        re.search("offered rate (.*?) bps", line)
+                        .group(1)
+                        .replace(" ", "")
+                    )
+                    stats["classes"][service]["drop_rate"] = (
+                        re.search("drop rate (.*?) bps", line).group(1).replace(" ", "")
+                    )
+            stats["success"] = True
         except:
-            stats['success'] = False
+            stats["success"] = False
         return stats
 
     def create_acl(self, acl_name, source_ip):
@@ -134,7 +149,7 @@ class Connection:
             [
                 "interface {}".format(interface),
                 "service-policy {} {}".format(type, policy_name),
-                "load-interval 30"
+                "load-interval 30",
             ]
         )
 
@@ -157,7 +172,7 @@ class Connection:
             for service_settings in policy.services:
                 service = service_settings.service
                 class_name = _generate_class_name(policy.name, service.name)
-                
+
                 if service.match_ips:
                     access_list_name = _generate_acl_name(service.name)
                     commands.append(
@@ -201,7 +216,7 @@ class Connection:
                     )
                 if service_settings.max_bandwidth:
                     commands.append(
-                        "shape average {}".format(service_settings.max_bandwidth*1000)
+                        "shape average {}".format(service_settings.max_bandwidth * 1000)
                     )
                 if service_settings.mark_dscp:
                     commands.append("set dscp {}".format(service_settings.mark_dscp))
@@ -279,6 +294,7 @@ class Connection:
             return "failed_authentication"
         except:
             return "timeout"
+
 
 def _ip_list_to_str(ip_list):
     return str(ip_list).replace("[", "").replace("]", "").replace(",", " ")

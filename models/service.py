@@ -1,6 +1,7 @@
 import sys
 import pathlib
-sys.path.append(str(pathlib.Path().absolute()).replace('/models',''))
+
+sys.path.append(str(pathlib.Path().absolute()).replace("/models", ""))
 
 from .base import BaseModel
 from app import db
@@ -10,7 +11,7 @@ import re
 class Service(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-    type = db.Column(db.String(20), default='standard')
+    type = db.Column(db.String(20), default="standard")
     match_protocol = db.Column(db.String(20))
     description = db.Column(db.String(2000))
     match_ips = db.Column(db.String(2000))
@@ -20,7 +21,7 @@ class Service(BaseModel):
     policies = db.relationship("ServicePolicySettings", back_populates="service")
 
     def supported_protocols_services(self):
-        return self.query.filter_by(type='protocol').all()
+        return self.query.filter_by(type="protocol").all()
 
     def __repr__(self):
         return "<Service %r - ID %r>" % (self.name, self.id)
