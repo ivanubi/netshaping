@@ -662,7 +662,7 @@ def get_devices_state(id=None):
 @app.route("/api/policies/<id>", methods=["GET"])
 def get_policies(id=None):
     if Policy.query.get(id):
-        Policy = Policy.query.get(id)
+        policy = Policy.query.get(id)
 
         return jsonify({"id": policy.id, "name": policy.name})
     elif id:
@@ -679,6 +679,15 @@ def api_update_interface(id=None):
     try:
         payload = request.get_json()
         interface = Interface.query.get(id)
+        if payload['policy_schedules']:
+            for schedule in payload["policy_schedules"]:
+                new = InterfacePolicySchedule(
+                        policy_id=schedule['policy_id'],
+                        interface_id=interface.id,
+                        time=schedule['time'] if schedule['time'] else None,
+                        day=schedule['day'] if schedule['day'] else None
+                    )
+                interface.policy_schedules.append(schedule)
         interface.set(
             description=payload["description"], bandwidth=payload["bandwidth"]
         )
