@@ -38,8 +38,9 @@
                 <thead>
                     <tr>
                     <th scope="col">ID</th>
-                    <th scope="col">Device Type</th>
                     <th scope="col">Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Interfaces</th>
                     <th scope="col">State</th>
                     <th scope="col">Actions</th>
                     </tr>
@@ -48,8 +49,17 @@
                 {% for device in devices: %}
                 <tr>
                     <th scope="row">{{device.id}}</th>
-                    <td>{{device.device_type}}</td>
-                    <td>{{device.name}}</td>
+                    <td>{{device.name|capitalize}}</td>
+                    <td><div class="badge badge-light">{{device.device_type|upper}}</div></td>
+                    <td>
+                    {% for interface in device.interfaces: %}
+                    <a
+                    href="{{url_for('interfaces', id=interface.id)}}"
+                    class="btn btn-sm btn-dark"
+                    >{{interface.name}}</a
+                    >
+                    {% endfor %}
+                    </td>
                     <td id="deviceState{{device.id}}">
                         {% if device.state == 'active': %}
                         <span class="badge badge-success">CONNECTED</span>
