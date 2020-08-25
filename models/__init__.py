@@ -5,7 +5,7 @@ sys.path.append(str(pathlib.Path().absolute()).replace("/models", ""))
 
 from net import Connection
 
-from models.interface import Interface
+from models.interface import Interface, InterfacePolicySchedule
 from models.device import Device
 from models.service import Service
 from models.policy import Policy, ServicePolicySettings
