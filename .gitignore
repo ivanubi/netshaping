@@ -8,4 +8,3 @@ celerybeat-schedule
 dump.rdb
 *.pyc
 celerybeat.pid
-task.txt
