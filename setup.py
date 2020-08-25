@@ -8,6 +8,7 @@ def setup_database():
         User(name="Jania Corona", email="janiacorona@netshaping.com"),
         User(name="Ivan Ubinas", email="ivanubinas@netshaping.com"),
         User(name="Steven Sanchez", email="stevensanchez@netshaping.com"),
+        User(name="Johnny Depp", email="admin@netshaping.com"),
     ]
     for user in users:
         user.set_password("cisco")
