@@ -12,8 +12,12 @@ class Policy(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     description = db.Column(db.String(2000))
+    changed = db.Column(db.Boolean, default=False)
     services = db.relationship("ServicePolicySettings", back_populates="policy")
     interfaces = db.relationship("Interface", back_populates="policy")
+    policy_schedules = db.relationship(
+        "InterfacePolicySchedule", back_populates="policy", cascade="all"
+    )
 
     def validate(self):
         if self.name and len(self.name) > 80:
@@ -45,6 +49,14 @@ class ServicePolicySettings(BaseModel):
 
     service = db.relationship("Service", back_populates="policies")
     policy = db.relationship("Policy", back_populates="services")
+
+    def validate(self):
+        if self.min_bandwidth and self.min_bandwidth < 8001:
+            return "minimum bandwidth should be greater than 8000kbps"
+        elif self.max_bandwidth and self.max_bandwidth < 8001:
+            return "shape bandwidth should be greater than 8000kbps"
+        else:
+            return None
 
     def create(self):
         self.service = Service.query.get(self.service_id)
