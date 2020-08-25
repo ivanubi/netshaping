@@ -1,8 +1,16 @@
 var iteration = 0
 
-function deleteSchedule(){
+function setup() {
+    iteration = parseInt(document.getElementById("iteration").innerHTML)
+    for (i = 0; i < iteration; i++) {
+        setPolicies(document.getElementById(`policyScheduleSelect${i}`))
+    }
+}
+setup()
+
+function deleteSchedule() {
     if (iteration > 0) {
-        document.getElementById("divSchedule" + (iteration-1)).remove()
+        document.getElementById("divSchedule" + (iteration - 1)).remove()
         iteration -= 1
     }
 }
@@ -10,20 +18,20 @@ function deleteSchedule(){
 function addSchedule() {
     if (iteration < 10) {
         divSchedules = document.getElementById('schedules')
-        rawHTML = 
-        `
+        rawHTML =
+            `
         <div id="divSchedule${iteration}" class="form-inline">
             <div class="ml">
                 <div>
                     Day<br>
                     <select name="policySchedules[${iteration}][day]" class="form-control">
-                        <option value="monday" selected>Monday</option>
-                        <option value="tuesday">Tuesday</option>
-                        <option value="wednesday">Wednesday</option>
-                        <option value="thursday">Thursday</option>
-                        <option value="friday">Friday</option>
-                        <option value="saturday">Saturday</option>
-                        <option value="sunday">Sunday</option>
+                        <option value="1" selected>Monday</option>
+                        <option value="2">Tuesday</option>
+                        <option value="3">Wednesday</option>
+                        <option value="4">Thursday</option>
+                        <option value="5">Friday</option>
+                        <option value="6">Saturday</option>
+                        <option value="0">Sunday</option>
                     </select>
                 </div>
             </div>
@@ -91,10 +99,10 @@ function setPolicyToInt(device_id) {
             bandwidth: document.getElementById("bandwidth").value,
             policy_schedules: []
         };
-    
+
         for (i = 0; i < iteration; i++) {
             policySchedule = {
-                day: document.getElementsByName(`policySchedules[${i}][day]`)[0].value,
+                day: parseInt(document.getElementsByName(`policySchedules[${i}][day]`)[0].value),
                 time: document.getElementsByName(`policySchedules[${i}][time]`)[0].value,
                 policy_id: document.getElementsByName(`policySchedules[${i}][policy]`)[0].value,
             };
@@ -132,7 +140,7 @@ function setPolicyToInt(device_id) {
                         document.getElementById(
                             "commandsModalBody"
                         ).innerHTML = response.commands.toString().replace(/,/g, "<br>");
-                        html_alert += 
+                        html_alert +=
                             `
                             <a type="button" data-toggle="modal" class="btn btn-link btn-sm" data-target="#commandsModal">
                             See the commands that NetShaping tried to configure
@@ -140,7 +148,7 @@ function setPolicyToInt(device_id) {
                             `
                     }
                     html_alert +=
-                    `
+                        `
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
