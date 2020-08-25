@@ -16,16 +16,16 @@
                             <a href="{{url_for('devices', id=interface.device.id)}}">{{interface.device.name}}</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{url_for('interfaces', id=interface.id)}}">{{interface.name}}</a>                
+                            <a href="{{url_for('interfaces', id=interface.id)}}">{{interface.name}}</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{url_for('update_interface', id=interface.id)}}">Settings</a>                
+                            <a href="{{url_for('update_interface', id=interface.id)}}">Settings</a>
                         </li>
                     </ol>
                 </div>
             </div>
         </div>
-        <form>
+        <form id="formID">
             <input name="interface_id" value="{{interface.id}}" hidden>
             <div class="card">
                 <div class="card-body">
@@ -35,29 +35,30 @@
                             <div class="form-group form-inline">
                                 <label for="interfaceName">Interface: </label>
                                 <span>
-                                <span class="ml-3">
-                                    {{interface.name}}
-                                </span>
+                                    <span class="ml-3">
+                                        {{interface.name}}
+                                    </span>
                                 </span>
                             </div>
                             <div class="form-group">
                                 <div class="form-inline">
-                                <label for="bandwidth">Bandwidth: </label>
+                                    <label for="bandwidth">Bandwidth: </label>
                                     <span class="ml-3 form-inline">
                                         <input class="form-control" type="number" name="bandwidth" id="bandwidth"
-                                        value={{interface.bandwidth}} required></input>
+                                            value={{interface.bandwidth}} required></input>
                                         <div class="input-group-append">
                                             <span class="input-group-text">kbps</span>
-                                    </div>
-                                </span>
+                                        </div>
+                                    </span>
                                 </div>
-                        
+
                             </div>
                             <div class="form-group">
                                 <div>
                                     <label for="description">Description:</label>
                                 </div>
-                                <textarea class="form-control" id="description" name="description">{%if interface.description:%}{{interface.description}}{%endif%}</textarea>
+                                <textarea class="form-control" id="description"
+                                    name="description">{%if interface.description:%}{{interface.description}}{%endif%}</textarea>
                             </div>
                         </div>
                         <div class="col">
@@ -67,9 +68,11 @@
                                     <label for="policy_id">Output Policy: </label>
                                     <div class="ml-2">
                                         <div>
-                                            <select class="form-control" id="policy_id" name="policy_id" id="policy_id" required>
+                                            <select class="form-control" id="policy_id" name="policy_id" id="policy_id"
+                                                required>
                                                 {% if interface.policy: %}
-                                                <option value="{{interface.policy.id}}" selected>{{interface.policy.name}} [Current]</option>
+                                                <option value="{{interface.policy.id}}" selected>
+                                                    {{interface.policy.name}} [Current]</option>
                                                 {% endif %}
                                                 {% for policy in policies: %}
                                                 <option value="{{policy.id}}">{{policy.name}}</option>
@@ -84,10 +87,52 @@
                                 <div onclick="deleteSchedule()" class="btn btn-sm btn-danger">DELETE -</div>
                                 <div onclick="addSchedule()" class="btn btn-sm btn-info text-dark">ADD +</div>
                                 <div id="schedules">
-                        
+                                    {% if interface.policy_schedules: %}
+                                    <span id="iteration" hidden>{{interface.policy_schedules|length}}</span>
+                                    {% for policy_schedule in interface.policy_schedules: %}
+                                    <div id="divSchedule{{loop.index0}}" class="form-inline">
+                                        <div class="ml">
+                                            <div>
+                                                Day<br>
+                                                <select name="policySchedules[{{loop.index0}}][day]"
+                                                    class="form-control">
+                                                    <option value="{{policy_schedule.day}}" selected>
+                                                        {{policy_schedule.day_text()}} [Current]</option>
+                                                    <option value="1">Monday</option>
+                                                    <option value="2">Tuesday</option>
+                                                    <option value="3">Wednesday</option>
+                                                    <option value="4">Thursday</option>
+                                                    <option value="5">Friday</option>
+                                                    <option value="6">Saturday</option>
+                                                    <option value="0">Sunday</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="ml">
+                                            <div>
+                                                Time<br>
+                                                <input name="policySchedules[{{loop.index0}}][time]" type="time"
+                                                    class="form-control"
+                                                    value="{{policy_schedule.time_text()}}"></input>
+                                            </div>
+                                        </div>
+                                        <div class="ml">
+                                            <div>
+                                                Policy<br>
+                                                <select id="policyScheduleSelect{{loop.index0}}"
+                                                    name="policySchedules[{{loop.index0}}][policy]"
+                                                    class="form-control">
+                                                    <option value="{{policy_schedule.policy_id}}">
+                                                        {{policy_schedule.policy.name}} [Current]</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
-                           
+
                         </div>
                     </div>
                     <br>
@@ -95,47 +140,51 @@
                         <div class="col">
                             <div id="alert"></div>
                             {% if error: %}
-                                <div class="alert alert-dark alert-dismissible fade show" role="alert">
-                                    <strong>Error!</strong> {{error}}.
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
+                            <div class="alert alert-dark alert-dismissible fade show" role="alert">
+                                <strong>Error!</strong> {{error}}.
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
                             {% endif %}
                         </div>
                         <div class="col">
                             <div class="float-right">
-                                <button form="deleteInterface" type="submit" class="btn btn-danger">Delete Interface</button>
-                                <a href="{{ url_for('interfaces', id=interface.id) }}" class="btn btn-secondary">Cancel</a>
-                                <button onclick="setPolicyToInt({{interface.id}})" id="submitButton" type="button" class="btn btn-success">Send Settings to the Interface</button>
+                                <button form="deleteInterface" type="submit" class="btn btn-danger">Delete
+                                    Interface</button>
+                                <a href="{{ url_for('interfaces', id=interface.id) }}"
+                                    class="btn btn-secondary">Cancel</a>
+                                <button onclick="setPolicyToInt({{interface.id}})" id="submitButton" type="button"
+                                    class="btn btn-success">Send Settings to the Interface</button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>                          
+            </div>
         </form>
     </div>
 </div>
 
-<div class="modal fade" id="commandsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="commandsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="w-100 modal-title text-center" id="exampleModalLabel">Commands</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="w-100 modal-title text-center" id="exampleModalLabel">Commands</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <small id="commandsModalBody" class="text-monospace">
+                </small>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
         </div>
-        <div class="modal-body">
-            <small id="commandsModalBody" class="text-monospace">
-            </small>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 
 <form id="deleteInterface" action="{{url_for('delete_interface', id=interface.id)}}" method="POST">
 </form>

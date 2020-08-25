@@ -19,15 +19,14 @@ def login():
         return redirect(url_for("devices"))
 
     if request.method == "POST":
-        email = request.form["email"]
+        email = request.form["email"].lower()
         password = request.form["password"]
         user = User.query.filter_by(email=email).first()
         if user and user.check_password(password=password):
             login_user(user)
             next_page = request.args.get("next")
             return redirect(next_page or url_for("devices"))
-        flash("Invalid username/password combination")
-        return redirect(url_for("login"))
+        return render_template("login.html", error="Incorrect password or email")
 
     return render_template("login.html")
 
@@ -49,6 +48,21 @@ def load_user(user_id):
 @login_manager.unauthorized_handler
 def unauthorized():
     return redirect(url_for("login"))
+
+
+@app.route("/users/new/", methods=["GET", "POST"])
+@login_required
+def new_user():
+    title = "New | Users"
+    if request.method == "POST":
+        new_user = User(name=request.form["name"], email=request.form["email"],)
+        new_user.set_password(request.form["email"])
+        new_user.create()
+        return redirect(url_for("devices"))
+    else:
+        return render_template(
+            "users/new.html", user=User(), title=title, current_user=current_user,
+        )
 
 
 """
@@ -249,15 +263,25 @@ def update_interface(id=None):
         interface.set(
             description=request.form["description"], bandwidth=request.form["bandwidth"]
         )
+        policy = Policy.query.get(int(request.form["policy_id"]))
+        if policy:
+            interface.policy = policy
 
-        if Policy.query.get(int(request.form["policy_id"])):
-            interface.policy = Policy.query.get(int(request.form["policy_id"]))
         error = interface.validate()
+        error_check_policy = interface.validate_policy_setting(policy)
         if error:
             return render_template(
                 "interfaces/edit.html",
                 interface=interface,
                 error=error,
+                title=title,
+                current_user=current_user,
+            )
+        elif error_check_policy:
+            return render_template(
+                "interfaces/edit.html",
+                interface=interface,
+                error=error_check_policy,
                 title=title,
                 current_user=current_user,
             )
@@ -546,8 +570,8 @@ def update_policy(id=None):
                 current_user=current_user,
             )
         else:
-            policy.delete_services_settings()
 
+            policy.delete_services_settings()
             for service_settings in policy_data["services"]:
                 service_policy_settings = ServicePolicySettings(
                     policy_id=policy.id,
@@ -557,6 +581,7 @@ def update_policy(id=None):
                     mark_dscp=service_settings["mark_dscp"],
                 )
                 service_policy_settings.create()
+            policy.changed = True
             policy.update()
 
             return redirect(url_for("policies", id=policy.id))
@@ -697,15 +722,20 @@ def api_update_interface(id=None):
     try:
         payload = request.get_json()
         interface = Interface.query.get(id)
+        if interface.policy_schedules:
+            for old_policy_schedule in interface.policy_schedules:
+                old_policy_schedule.delete()
         if payload["policy_schedules"]:
             for schedule in payload["policy_schedules"]:
                 new = InterfacePolicySchedule(
                     policy_id=schedule["policy_id"],
                     interface_id=interface.id,
-                    time=schedule["time"] if schedule["time"] else None,
+                    time=datetime.strptime(schedule["time"], "%H:%M").time()
+                    if schedule["time"]
+                    else None,
                     day=schedule["day"] if schedule["day"] else None,
                 )
-                interface.policy_schedules.append(schedule)
+                new.create()
         interface.set(
             description=payload["description"], bandwidth=payload["bandwidth"]
         )
@@ -755,3 +785,4 @@ def api_update_interface(id=None):
                 )
     except Exception as error:
         return jsonify({"status": "error", "response": "{}".format(error)})
+

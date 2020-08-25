@@ -1,91 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        {% block head %}
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui"
-        />
-        <title>{{title.replace("'", "")}} | NetShaping</title>
-        <meta content="Admin Dashboard" name="description" />
-        <link rel="shortcut icon" href="{{url_for('static', filename='images/favicon.ico')}}" />
-        <link
-            href="{{url_for('static', filename='css/icons.css')}}"
-            rel="stylesheet"
-            type="text/css"
-        />
-        <link
-            href="{{url_for('static', filename='css/metismenu.min.css')}}"
-            rel="stylesheet"
-            type="text/css"
-        />
-        <link
-            href="{{url_for('static', filename='css/bootstrap.min.css')}}"
-            rel="stylesheet"
-            type="text/css"
-        />
-        <link
-            href="{{url_for('static', filename='css/style.css')}}"
-            rel="stylesheet"
-            type="text/css"
-        />
-        {% endblock %}
-    </head>
 
-    <body>
-        <div id="wrapper">
-            <div class="topbar">
-                <div class="topbar-left">
-                    <a href="/" class="logo">
-                        <span>
-                            <img
-                                src="{{url_for('static', filename='images/netshaping.png')}}"
-                                alt=""
-                                height="18"
-                            />
-                        </span>
-                        <i>
-                            <img
-                                src="{{url_for('static', filename='images/logo-sm.png')}}"
-                                alt=""
-                                height="22"
-                            />
-                        </i>
-                    </a>
-                </div>
+<head>
+    {% block head %}
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
+    <title>{{title.replace("'", "")}} | NetShaping</title>
+    <meta content="Admin Dashboard" name="description" />
+    <link rel="shortcut icon" href="{{url_for('static', filename='images/favicon.ico')}}" />
+    <link href="{{url_for('static', filename='css/icons.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{url_for('static', filename='css/metismenu.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet" type="text/css" />
+    {% endblock %}
+</head>
 
-                <nav class="navbar-custom">
-                    <ul class="navbar-right list-inline float-right mb-0">
-                        <li class="dropdown notification-list list-inline-item">
-                            <div class="dropdown notification-list nav-pro-img">
-                                <a
-                                    class="dropdown-toggle nav-link arrow-none waves-effect nav-user inline"
-                                    data-toggle="dropdown"
-                                    href="#"
-                                    role="button"
-                                    aria-haspopup="false"
-                                    aria-expanded="false"
-                                >
-                                    <span class="mr-2"
-                                        >{{current_user.name}}<small class="ml-1"
-                                            >({{current_user.email}})</small
-                                        ></span
-                                    >
-                                    <img
-                                        src="https://upload.wikimedia.org/wikipedia/commons/5/50/Black_colour.jpg"
-                                        alt="user"
-                                        class="rounded-circle"
-                                    />
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right profile-dropdown">
-                                    <a
-                                        class="dropdown-item"
-                                        href="{{url_for('users', id=current_user.id)}}"
-                                        ><i class="mdi mdi-account-circle m-r-5"></i> Account</a
-                                    >
-                                    <!--
+<body>
+    <div id="wrapper">
+        <div class="topbar">
+            <div class="topbar-left">
+                <a href="/" class="logo">
+                    <span>
+                        <img src="{{url_for('static', filename='images/netshaping.png')}}" alt="" height="18" />
+                    </span>
+                    <i>
+                        <img src="{{url_for('static', filename='images/logo-sm.png')}}" alt="" height="22" />
+                    </i>
+                </a>
+            </div>
+
+            <nav class="navbar-custom">
+                <ul class="navbar-right list-inline float-right mb-0">
+                    <li class="dropdown notification-list list-inline-item">
+                        <div class="dropdown notification-list nav-pro-img">
+                            <a class="dropdown-toggle nav-link arrow-none waves-effect nav-user inline"
+                                data-toggle="dropdown" href="#" role="button" aria-haspopup="false"
+                                aria-expanded="false">
+                                <span class="mr-2">{{current_user.name}}<small
+                                        class="ml-1">({{current_user.email}})</small></span>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/5/50/Black_colour.jpg"
+                                    alt="user" class="rounded-circle" />
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right profile-dropdown">
+                                <a class="dropdown-item" href="{{url_for('users', id=current_user.id)}}"><i
+                                        class="mdi mdi-account-circle m-r-5"></i> Account</a>
+                                <!--
                                      <a class="dropdown-item d-block" href="#"
                                         ><span
                                             class="badge badge-success float-right"
@@ -94,114 +54,82 @@
                                         Settings</a
                                     >   
                                     -->
-                                    <div class="dropdown-divider"></div>
-                                    <a
-                                        class="dropdown-item text-danger"
-                                        href="{{url_for('logout')}}"
-                                        ><i class="mdi text-danger mdi-lock-outline m-r-5"></i>Log
-                                        out</a
-                                    >
-                                </div>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item text-danger" href="{{url_for('logout')}}"><i
+                                        class="mdi text-danger mdi-lock-outline m-r-5"></i>Log
+                                    out</a>
                             </div>
-                        </li>
-                    </ul>
-                    <ul class="list-inline menu-left mb-0">
-                        <li class="float-left">
-                            <button class="button-menu-mobile open-left waves-effect">
-                                <i class="mdi mdi-menu"></i>
-                            </button>
-                        </li>
-                        <li class="d-none d-sm-block">
-                            <div class="dropdown pt-3 d-inline-block">
-                                <a
-                                    class="btn btn-info dropdown-toggle"
-                                    href="#"
-                                    role="button"
-                                    id="dropdownMenuLink"
-                                    data-toggle="dropdown"
-                                    aria-haspopup="true"
-                                    aria-expanded="false"
-                                >
-                                    New
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" href="{{url_for('new_device')}}"
-                                        >Network Device</a
-                                    >
-                                    <a class="dropdown-item" href="{{url_for('new_policy')}}"
-                                        >Network Policy</a
-                                    >
-                                    <a class="dropdown-item" href="{{url_for('new_service')}}"
-                                        >Network Service</a
-                                    >
-                                    <a class="dropdown-item" href="#">Network User</a>
-                                </div>
+                        </div>
+                    </li>
+                </ul>
+                <ul class="list-inline menu-left mb-0">
+                    <li class="float-left">
+                        <button class="button-menu-mobile open-left waves-effect">
+                            <i class="mdi mdi-menu"></i>
+                        </button>
+                    </li>
+                    <li class="d-none d-sm-block">
+                        <div class="dropdown pt-3 d-inline-block">
+                            <a class="btn btn-info dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                New
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="{{url_for('new_device')}}">Network Device</a>
+                                <a class="dropdown-item" href="{{url_for('new_policy')}}">Network Policy</a>
+                                <a class="dropdown-item" href="{{url_for('new_service')}}">Network Service</a>
                             </div>
+                        </div>
 
-                            <div class="dropdown pt-3 d-inline-block">
-                                <a
-                                    class="btn btn-success dropdown-toggle"
-                                    href="#"
-                                    role="button"
-                                    id="dropdownMenuLink"
-                                    data-toggle="dropdown"
-                                    aria-haspopup="true"
-                                    aria-expanded="false"
-                                >
-                                    Manage
-                                </a>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                    <a class="dropdown-item" href="{{url_for('devices')}}"
-                                        >Network Devices</a
-                                    >
-                                    <a class="dropdown-item" href="{{url_for('policies')}}"
-                                        >Network Policies</a
-                                    >
-                                    <a class="dropdown-item" href="{{url_for('services')}}"
-                                        >Network Services</a
-                                    >
-                                    <a class="dropdown-item" href="#">Network Users</a>
-                                </div>
+                        <div class="dropdown pt-3 d-inline-block">
+                            <a class="btn btn-success dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Manage
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                <a class="dropdown-item" href="{{url_for('devices')}}">Network Devices</a>
+                                <a class="dropdown-item" href="{{url_for('policies')}}">Network Policies</a>
+                                <a class="dropdown-item" href="{{url_for('services')}}">Network Services</a>
+                                <a class="dropdown-item" href="{{url_for('new_user')}}">Network Services</a>
                             </div>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="left side-menu">
+            <div class="slimscroll-menu" id="remove-scroll">
+                <div id="sidebar-menu">
+                    <ul class="metismenu" id="side-menu">
+                        <li class="menu-title">Manage Network</li>
+                        <li>
+                            <a href="{{url_for('devices')}}" class="waves-effect text-light"><i
+                                    class="ti-receipt"></i><span> Network Devices </span></a>
+                        </li>
+                        <li>
+                            <a href="{{url_for('policies')}}" class="waves-effect text-light"><i
+                                    class="ti-pie-chart"></i><span> Policies </span></a>
+                        </li>
+                        <li>
+                            <a href="{{url_for('services')}}" class="waves-effect text-light"><i
+                                    class="ti-view-grid"></i><span> Services </span></a>
                         </li>
                     </ul>
-                </nav>
-            </div>
-            <div class="left side-menu">
-                <div class="slimscroll-menu" id="remove-scroll">
-                    <div id="sidebar-menu">
-                        <ul class="metismenu" id="side-menu">
-                            <li class="menu-title">Manage Network</li>
-                            <li>
-                                <a href="{{url_for('devices')}}" class="waves-effect text-light"
-                                    ><i class="ti-receipt"></i><span> Network Devices </span></a
-                                >
-                            </li>
-                            <li>
-                                <a href="{{url_for('policies')}}" class="waves-effect text-light"
-                                    ><i class="ti-pie-chart"></i><span> Policies </span></a
-                                >
-                            </li>
-                            <li>
-                                <a href="{{url_for('services')}}" class="waves-effect text-light"
-                                    ><i class="ti-view-grid"></i><span> Services </span></a
-                                >
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="clearfix"></div>
                 </div>
-            </div>
-            <div class="content-page">
-                {% block content %}{% endblock %}
+                <div class="clearfix"></div>
             </div>
         </div>
-        <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
-        <script src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+        <div class="content-page">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    <script src="{{url_for('static', filename='js/jquery.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
 
-        <script src="{{url_for('static', filename='js/metisMenu.min.js')}}"></script>
-        <script src="{{url_for('static', filename='js/jquery.slimscroll.js')}}"></script>
-        <script src="{{url_for('static', filename='js/waves.min.js')}}"></script>
-        <script src="{{url_for('static', filename='js/app.js')}}"></script>
-    </body>
+    <script src="{{url_for('static', filename='js/metisMenu.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery.slimscroll.js')}}"></script>
+    <script src="{{url_for('static', filename='js/waves.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/app.js')}}"></script>
+</body>
+
 </html>
