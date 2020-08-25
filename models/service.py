@@ -12,6 +12,7 @@ class Service(BaseModel):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     type = db.Column(db.String(20), default="standard")
+    changed = db.Column(db.Boolean, default=False)
     match_protocol = db.Column(db.String(20))
     description = db.Column(db.String(2000))
     match_ips = db.Column(db.String(2000))
