@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices')}}">Network Devices</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices', id=device.id)}}">{{device.name}}</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a>Running Config</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                {% if running_config: %}
+                {% for line in running_config:%}
+                {{ line }}<br />
+                {% endfor %}
+                {% endif %}
+                <br />
+
+                <div class="card-footer bg-transparent row">
+                    <div class="col">
+                        <div class="float-right">
+                            <a href="{{url_for('devices', id=device.id)}}" class="btn btn-secondary">Get Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
