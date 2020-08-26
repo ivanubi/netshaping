@@ -45,6 +45,11 @@ celery.conf.beat_schedule = {
         "schedule": 60.0,
         "options": {"queue": "celery3"},
     },
+    "check-active-devices": {
+        "task": "app.check_active_devices",
+        "schedule": 30.0,
+        "options": {"queue": "celery4"},
+    },
 }
 app.config.update(DEBUG=True, SECRET_KEY=b"ACEDEJEADEJE")
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database/database.db"
@@ -96,6 +101,18 @@ def check_policy_schedule():
                     interface.name, policy.name
                 )
                 if commands and was_succesful == True:
+                    text_commands = ""
+                    for command in commands:
+                        text_commands = text_commands + "\n" + command
+                    new_log = Log(
+                        name="Policy Update",
+                        description="{} had an scheduled policy change ({} -> {})".format(
+                            interface.name, interface.policy.name, policy.name
+                        ),
+                        commands=text_commands,
+                        type="scheduled_policy_change",
+                    )
+                    interface.device.logs.append(new_log)
                     interface.policy_id = policy.id
                     interface.policy = policy
                     interface.update()
@@ -124,10 +141,23 @@ def policy_changes():
                         interface.name, policy.name
                     )
                     if commands and was_succesful == True:
+                        text_commands = ""
+                        for command in commands:
+                            text_commands = text_commands + "\n" + command
+                        new_log = Log(
+                            name="Policy Update",
+                            description="{} had a policy update ({} -> updated {})".format(
+                                interface.name, interface.policy.name, policy.name
+                            ),
+                            commands=text_commands,
+                            type="policy_update",
+                        )
+                        interface.device.logs.append(new_log)
                         interface.policy_id = policy.id
                         interface.policy = policy
                         interface.update()
-                except:
+                except Exception as e:
+                    print(e)
                     continue
 
 
@@ -135,7 +165,6 @@ def policy_changes():
 def policy_stats():
     try:
         print("EXECUTING POLICY STATS")
-        check_active_devices()
         interfaces = Interface.query.filter(Interface.policy_id != None).all()
         for interface in interfaces:
             device = interface.device
@@ -159,7 +188,9 @@ def policy_stats():
         print(e)
 
 
+@celery.task
 def check_active_devices():
+    print("EXECUTING CHECK ACTIVE DEVICES")
     devices = Device.query.all()
     for device in devices:
         connection = Connection(
