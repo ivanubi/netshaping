@@ -51,10 +51,10 @@ class ServicePolicySettings(BaseModel):
     policy = db.relationship("Policy", back_populates="services")
 
     def validate(self):
-        if self.min_bandwidth and self.min_bandwidth < 8001:
-            return "minimum bandwidth should be greater than 8000kbps"
-        elif self.max_bandwidth and self.max_bandwidth < 8001:
-            return "shape bandwidth should be greater than 8000kbps"
+        if self.min_bandwidth and self.min_bandwidth < 8:
+            return "minimum bandwidth should be greater than 8kbps"
+        elif self.max_bandwidth and self.max_bandwidth < 8:
+            return "shape bandwidth should be greater than 8kbps"
         else:
             return None
 
