@@ -1,0 +1,75 @@
+{% extends "base.html" %} {% block content %}
+<div class="content">
+    <div class="container-fluid">
+        <div class="page-title-box">
+            <div class="row align-items-center">
+                <div class="col-sm-6">
+                    <h4 class="page-title">
+                        <a href="{{url_for('devices')}}">Network</a>
+                    </h4>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices')}}">Network Devices</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{url_for('devices', id=device.id)}}">{{device.name}}</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a>Logs</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                {% if not logs: %}
+                <span style="margin-left: 400px; margin-top: 150px;" class="h4 text-center">
+                    0 logs found</span>
+                {% else: %}
+                <div class="card border border-dark rounded row">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Type</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs: %}
+                            <tr>
+                                <th scope="row">{{log.id}}</th>
+                                <td>{{log.name|capitalize}}</td>
+                                <td>
+                                    <div class="badge badge-light">{{log.type|upper}}</div>
+                                </td>
+                                <td>
+                                    {{log.description}}
+                                </td>
+                                <td>
+                                    <a href="{{url_for('logs', id=log.id)}}" class="btn btn-sm btn-info"
+                                        class="stretched-link">See Logs</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+                <br />
+
+                <div class="card-footer bg-transparent row">
+                    <div class="col">
+                        <div class="float-right">
+                            <a href="{{url_for('devices', id=device.id)}}" class="btn btn-secondary">Get Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

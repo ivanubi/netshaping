@@ -98,6 +98,84 @@ def devices(id=None):
         )
 
 
+@app.route("/devices/<id>/config", methods=["GET"])
+@login_required
+def device_running_config(id=None):
+    if id:
+        device = Device.query.get(id)
+        title = "%r | Devices | Running Config " % device.name
+        connection = Connection(
+            host=device.host,
+            username=device.ssh_username,
+            password=device.ssh_password,
+        )
+        running_config = connection.running_config()
+        return render_template(
+            "devices/show_config.html",
+            title=title,
+            device=device,
+            running_config=running_config.split("\n"),
+            current_user=current_user,
+        )
+    else:
+        title = "Devices"
+        return render_template(
+            "devices/index.html",
+            title=title,
+            devices=Device.query.all(),
+            current_user=current_user,
+        )
+
+
+@app.route("/devices/<id>/logs", methods=["GET"])
+@login_required
+def device_logs(id=None):
+    if id:
+        device = Device.query.get(id)
+        logs = device.logs
+        title = "%r | Devices | Logs " % device.name
+        return render_template(
+            "devices/logs.html",
+            title=title,
+            device=device,
+            logs=logs,
+            current_user=current_user,
+        )
+    else:
+        title = "Devices"
+        return render_template(
+            "devices/index.html",
+            title=title,
+            devices=Device.query.all(),
+            current_user=current_user,
+        )
+
+
+@app.route("/logs/<id>", methods=["GET"])
+@login_required
+def logs(id=None):
+    if id:
+        log = Log.query.get(id)
+        device = log.device
+        title = "%r | Devices | Logs " % device.name
+        return render_template(
+            "devices/show_logs.html",
+            title=title,
+            device=device,
+            log=log,
+            commands=log.commands.split("\n"),
+            current_user=current_user,
+        )
+    else:
+        title = "Devices"
+        return render_template(
+            "devices/index.html",
+            title=title,
+            devices=Device.query.all(),
+            current_user=current_user,
+        )
+
+
 @app.route("/devices/new/", methods=["GET", "POST"])
 @login_required
 def new_device():

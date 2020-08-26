@@ -18,10 +18,13 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="float-right d-none d-md-block">
-                        <a
-                            href="{{url_for('update_device', id=device.id)}}"
-                            class="btn btn-primary"
-                        >
+                        <a href="{{url_for('device_running_config', id=device.id)}}" class="btn btn-info">
+                            <i class="mdi mdi-file mr-2"></i>Running Config
+                        </a>
+                        <a href="{{url_for('device_logs', id=device.id)}}" class="btn btn-info">
+                            <i class="mdi mdi-information mr-2"></i>Logs
+                        </a>
+                        <a href="{{url_for('update_device', id=device.id)}}" class="btn btn-primary">
                             <i class="mdi mdi-settings mr-2"></i>Settings
                         </a>
                     </div>
@@ -92,8 +95,7 @@
                         </div>
                         <button
                             onclick="tryDeviceConnection('{{device.host}}', '{{device.ssh_username}}', '{{device.ssh_password}}')"
-                            class="btn btn-sm btn-primary"
-                        >
+                            class="btn btn-sm btn-primary">
                             <i class="mdi mdi-chevron-double-right"></i> Check Connection
                         </button>
                         Connection Status: <span id="connectionStatus">-</span>
@@ -104,19 +106,13 @@
                         <div class="card-title">Interfaces:</div>
                         <div>
                             {% for interface in device.interfaces: %}
-                            <a
-                                href="{{url_for('interfaces', id=interface.id)}}"
-                                class="btn btn-sm btn-dark"
-                                >{{interface.name}}</a
-                            >
+                            <a href="{{url_for('interfaces', id=interface.id)}}"
+                                class="btn btn-sm btn-dark">{{interface.name}}</a>
                             {% endfor%}
                         </div>
                         <br />
                         <div>
-                            <button
-                                onclick="updateDeviceInterfaces('{{device.id}}')"
-                                class="btn btn-sm btn-primary"
-                            >
+                            <button onclick="updateDeviceInterfaces('{{device.id}}')" class="btn btn-sm btn-primary">
                                 <i class="mdi mdi-chevron-double-right"></i>
                                 Import Interfaces
                             </button>
@@ -132,12 +128,7 @@
                         {% if feedback: %}
                         <div class="alert alert-dark alert-dismissible fade show" role="alert">
                             {{feedback}}
-                            <button
-                                type="button"
-                                class="close"
-                                data-dismiss="alert"
-                                aria-label="Close"
-                            >
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
