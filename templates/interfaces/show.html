@@ -12,24 +12,16 @@
                             <a href="{{url_for('devices')}}">Network Devices</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a
-                                href="{{url_for('devices', id=interface.device.id)}}"
-                                >{{interface.device.name}}</a
-                            >
+                            <a href="{{url_for('devices', id=interface.device.id)}}">{{interface.device.name}}</a>
                         </li>
                         <li class="breadcrumb-item">
-                            <a href="{{url_for('interfaces', id=interface.id)}}"
-                                >{{interface.name}}</a
-                            >
+                            <a href="{{url_for('interfaces', id=interface.id)}}">{{interface.name}}</a>
                         </li>
                     </ol>
                 </div>
                 <div class="col-sm-6 ">
                     <div class="float-right d-none d-md-block">
-                        <a
-                            href="{{url_for('update_interface', id=interface.id)}}"
-                            class="btn btn-primary"
-                        >
+                        <a href="{{url_for('update_interface', id=interface.id)}}" class="btn btn-primary">
                             <i class="mdi mdi-settings mr-2"></i>
                             Settings
                         </a>
@@ -65,9 +57,7 @@
                             </div>
                             <div class="form-group">
                                 <div>
-                                    <label for="deviceDescription"
-                                        >Description:</label
-                                    >
+                                    <label for="deviceDescription">Description:</label>
                                 </div>
                                 <small class="form-text text-muted">
                                     {% if interface.description: %}
@@ -80,36 +70,68 @@
                             <div class="card-title">Output Policy</div>
                             <div class="form-group">
                                 <div class="form-inline">
-                                    <label for="deviceHost"
-                                        >Current Policy:
+                                    <label for="deviceHost">Current Policy:
                                     </label>
                                     <div class="ml-2">
                                         <div>
                                             {% if interface.policy: %}
-                                            <a
-                                                href="{{url_for('policies',id=interface.policy.id)}}"
-                                                class="btn btn-sm btn-dark"
-                                                >{{interface.policy.name}}</a
-                                            >
+                                            <a href="{{url_for('policies',id=interface.policy.id)}}"
+                                                class="btn btn-sm btn-dark">{{interface.policy.name}}</a>
                                             {% else: %} - {% endif %}
                                         </div>
                                     </div>
+                                </div>
+                                <div id="schedules">
+                                    {% if interface.policy_schedules: %}
+                                    <span id="iteration" hidden>{{interface.policy_schedules|length}}</span>
+                                    {% for policy_schedule in interface.policy_schedules: %}
+                                    <div id="divSchedule{{loop.index0}}" class="form-inline">
+                                        <div class="ml">
+                                            <div>
+                                                Day<br>
+                                                <select name="policySchedules[{{loop.index0}}][day]"
+                                                    class="form-control" disabled>
+                                                    <option value="{{policy_schedule.day}}" selected>
+                                                        {{policy_schedule.day_text()}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="ml">
+                                            <div>
+                                                Time<br>
+                                                <input name="policySchedules[{{loop.index0}}][time]" type="time"
+                                                    class="form-control" value="{{policy_schedule.time_text()}}"
+                                                    disabled></input>
+                                            </div>
+                                        </div>
+                                        <div class="ml">
+                                            <div>
+                                                Policy<br>
+                                                <select id="policyScheduleSelect{{loop.index0}}"
+                                                    name="policySchedules[{{loop.index0}}][policy]" class="form-control"
+                                                    disabled>
+                                                    <option value="{{policy_schedule.policy_id}}">
+                                                        {{policy_schedule.policy.name}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div id="charts">
-                        <span id="loading" style="margin-left: 45%;"><img src="/static/images/loading4.svg"  width="30"></img><br>
+                        <span id="loading" style="margin-left: 45%;"><img src="/static/images/loading4.svg"
+                                width="30"></img><br>
                         </span>
                     </div>
                     <br />
                     <div class="card-footer bg-transparent">
                         <div class="float-right">
-                            <a
-                                href="{{url_for('devices',id=interface.device.id)}}"
-                                class="btn btn-secondary"
-                                >Get Back</a
-                            >
+                            <a href="{{url_for('devices',id=interface.device.id)}}" class="btn btn-secondary">Get
+                                Back</a>
                         </div>
                     </div>
                 </div>
@@ -122,140 +144,142 @@
 
 
 <script>
-    
+
     function formatNumber(num) {
         return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
     }
-    var getJSON = function(url, callback) {
+    var getJSON = function (url, callback) {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'json';
-        xhr.onload = function() {
-        var status = xhr.status;
-        if (status === 200) {
-            callback(null, xhr.response);
-        } else {
-            callback(status, xhr.response);
-        }
+        xhr.onload = function () {
+            var status = xhr.status;
+            if (status === 200) {
+                callback(null, xhr.response);
+            } else {
+                callback(status, xhr.response);
+            }
         };
         xhr.send();
     };
     var obj = {}
     var firstTime = true
-    var update_charts = function() {
+    var update_charts = function () {
         getJSON('/api/interfaces/{{interface.id}}',
-        function(err, data) {
-            if (err !== null) {
-                document.getElementById('loading').remove()
-            } else {
-                for (const [key, stat] of Object.entries(data.data)) {
-                    if (firstTime == true) {
-                        html = `
+            function (err, data) {
+                if (err !== null) {
+                    document.getElementById('loading').remove()
+                } else {
+                    for (const [key, stat] of Object.entries(data.data)) {
+                        if (firstTime == true) {
+                            html = `
                         <div>
                             <canvas id="${key}"></canvas>
                         </div>
                         <br>
                         `
-                        document.getElementById('charts').insertAdjacentHTML("beforeend", html);
-                    }
-                    
-                    var offeredRateData = [], dropRateData = []
+                            document.getElementById('charts').insertAdjacentHTML("beforeend", html);
+                        }
 
-                    for (i = 0; i < stat.dates.length; i++) {
-                        offeredRateData.push({
-                            t: new Date(stat.dates[i]),
-                            y: stat.offered_rates[i]/1000,
-                        })  
-                        dropRateData.push({
-                            t: new Date(stat.dates[i]),
-                            y: stat.drop_rates[i]/1000,
-                        })
-                    } 
-                    if (firstTime == true) {
-                        var ctx = document.getElementById(key).getContext('2d');
+                        var offeredRateData = [], dropRateData = []
 
-                        obj[key] = new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                datasets: 
-                                [{ 
-                                    data: offeredRateData,
-                                    label: "OFFERED RATE (last 30 seconds)",
-                                    borderColor: "green",
-                                    fill: false}, 
-                                    { 
-                                    data: dropRateData,
-                                    label: "DROP RATE (last 30 seconds)",
-                                    borderColor: "white",
-                                    fill: false
-                                }]
-                            },
-                            options: {
-                                tooltips: {
-                                    enabled: true,
-                                    intersect: false,
+                        for (i = 0; i < stat.dates.length; i++) {
+                            offeredRateData.push({
+                                t: new Date(stat.dates[i]),
+                                y: stat.offered_rates[i] / 1000,
+                            })
+                            dropRateData.push({
+                                t: new Date(stat.dates[i]),
+                                y: stat.drop_rates[i] / 1000,
+                            })
+                        }
+                        if (firstTime == true) {
+                            var ctx = document.getElementById(key).getContext('2d');
+
+                            obj[key] = new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    datasets:
+                                        [{
+                                            data: offeredRateData,
+                                            label: "OFFERED RATE (last 30 seconds)",
+                                            borderColor: "green",
+                                            fill: false
+                                        },
+                                        {
+                                            data: dropRateData,
+                                            label: "DROP RATE (last 30 seconds)",
+                                            borderColor: "white",
+                                            fill: false
+                                        }]
                                 },
-                                title: {
-                                    display: true,
-                                    text: `Class: ${key}`,
-                                    fontColor: 'white'
-                                },
-                                legend: {
-                                    labels: {
+                                options: {
+                                    tooltips: {
+                                        enabled: true,
+                                        intersect: false,
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: `Class: ${key}`,
                                         fontColor: 'white'
-                                    }
-                                },
-                                scales: {
-                                    xAxes: [{
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: 'Time',
-                                            fontColor: 'white',
-                                        },
-                                        type: 'time',
-                                        time: {
-                                            unit: 'second',
-                                            stepSize: 10,
-                                        }, 
-                                    }],
-                                    yAxes: [{
-                                        scaleLabel: {
-                                            display: true,
-                                            labelString: 'Average Speed',
+                                    },
+                                    legend: {
+                                        labels: {
                                             fontColor: 'white'
-                                        },
-                                        ticks: {
-                                            beginAtZero: true,
-                                            fontColor: 'white',
-                                            callback: function(value, index, values) {
-                                                return formatNumber(value) + 'Kbps';
-                                            }
                                         }
-                                    }]
+                                    },
+                                    scales: {
+                                        xAxes: [{
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: 'Time',
+                                                fontColor: 'white',
+                                            },
+                                            type: 'time',
+                                            time: {
+                                                unit: 'second',
+                                                stepSize: 10,
+                                            },
+                                        }],
+                                        yAxes: [{
+                                            scaleLabel: {
+                                                display: true,
+                                                labelString: 'Average Speed',
+                                                fontColor: 'white'
+                                            },
+                                            ticks: {
+                                                beginAtZero: true,
+                                                fontColor: 'white',
+                                                callback: function (value, index, values) {
+                                                    return formatNumber(value) + 'Kbps';
+                                                }
+                                            }
+                                        }]
+                                    }
                                 }
-                            }
-                        });
-                    } else {
-                        obj[key].data.datasets = [{
-                            data: offeredRateData,
-                            label: "OFFERED RATE (last 30 seconds)",
-                            borderColor: "green",
-                            fill: false}, 
-                            { 
-                            data: dropRateData,
-                            label: "DROP RATE (last 30 seconds)",
-                            borderColor: "white",
-                            fill: false
-                        }]
-                        obj[key].update()
+                            });
+                        } else {
+                            obj[key].data.datasets = [{
+                                data: offeredRateData,
+                                label: "OFFERED RATE (last 30 seconds)",
+                                borderColor: "green",
+                                fill: false
+                            },
+                            {
+                                data: dropRateData,
+                                label: "DROP RATE (last 30 seconds)",
+                                borderColor: "white",
+                                fill: false
+                            }]
+                            obj[key].update()
+                        }
                     }
                 }
-            }
-            if (firstTime == true){
-                document.getElementById('loading').remove()
-            }
-            firstTime = false
-        })
+                if (firstTime == true) {
+                    document.getElementById('loading').remove()
+                }
+                firstTime = false
+            })
     }
     update_charts()
     setInterval(update_charts, 40000)
