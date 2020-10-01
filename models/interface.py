@@ -50,9 +50,7 @@ class Interface(BaseModel):
         if self.description and len(self.description) > 2000:
             return "Too long description"
         elif (
-            self.bandwidth
-            and (self.bandwidth.isdigit() == False)
-            or (int(self.bandwidth) < 1)
+            self.bandwidth and (int(self.bandwidth) < 1)
         ):
             return "Invalid bandwidth"
 
