@@ -181,16 +181,21 @@
                             document.getElementById('charts').insertAdjacentHTML("beforeend", html);
                         }
 
-                        var offeredRateData = [], dropRateData = []
+                        var offeredRateData = [], dropRateData = [], outputRateData = []
 
                         for (i = 0; i < stat.dates.length; i++) {
+                            date = new Date(stat.dates[i])
                             offeredRateData.push({
-                                t: new Date(stat.dates[i]),
+                                t: date,
                                 y: stat.offered_rates[i] / 1000,
                             })
                             dropRateData.push({
-                                t: new Date(stat.dates[i]),
+                                t: date,
                                 y: stat.drop_rates[i] / 1000,
+                            })
+                            outputRateData.push({
+                                t: date,
+                                y: (stat.offered_rates[i] - stat.drop_rates[i]) / 1000,
                             })
                         }
                         if (firstTime == true) {
@@ -210,6 +215,12 @@
                                             data: dropRateData,
                                             label: "DROP RATE (last 30 seconds)",
                                             borderColor: "white",
+                                            fill: false
+                                        },
+                                        {
+                                            data: outputRateData,
+                                            label: "OUTPUT RATE (last 30 seconds)",
+                                            borderColor: "blue",
                                             fill: false
                                         }]
                                 },
@@ -269,6 +280,12 @@
                                 data: dropRateData,
                                 label: "DROP RATE (last 30 seconds)",
                                 borderColor: "white",
+                                fill: false
+                            },
+                            {
+                                data: outputRateData,
+                                label: "OUTPUT RATE (last 30 seconds)",
+                                borderColor: "blue",
                                 fill: false
                             }]
                             obj[key].update()
