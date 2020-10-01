@@ -10,7 +10,6 @@ import json
 from models import *
 from flask_login import login_required, logout_user, current_user, login_user
 from datetime import date, datetime, timedelta
-from sqlalchemy import func
 
 
 @app.route("/login/", methods=["GET", "POST"])
@@ -814,11 +813,10 @@ def api_update_interface(id=None):
                     day=schedule["day"] if schedule["day"] else None,
                 )
                 new.create()
-        interface.set(
-            description=payload["description"], bandwidth=payload["bandwidth"]
-        )
         policy = Policy.query.get(int(payload["policy_id"]))
         interface.policy = policy if policy else interface.policy
+        interface.set(description=payload["description"], bandwidth=int(payload["bandwidth"]))
+        error_check_policy = interface.validate_policy_setting(policy)
         error = interface.validate()
         if error:
             return jsonify(
@@ -827,7 +825,10 @@ def api_update_interface(id=None):
                     "response": "Validation failed, check the new bandwidth or description",
                 }
             )
+        elif error_check_policy:
+            return jsonify({"status": "error", "response": error_check_policy,})
         else:
+            interface.update()
             connection = Connection(
                 host=interface.device.host,
                 username=interface.device.ssh_username,
@@ -838,7 +839,6 @@ def api_update_interface(id=None):
                 interface.name, interface.policy.name
             )
             if commands and was_succesful == True:
-                interface.update()
                 return jsonify(
                     {
                         "status": "success",
@@ -862,5 +862,5 @@ def api_update_interface(id=None):
                     }
                 )
     except Exception as error:
-        return jsonify({"status": "error", "response": "{}".format(error)})
+       return jsonify({"status": "error", "response": "{}".format(error)})
 
