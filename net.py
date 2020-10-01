@@ -176,6 +176,9 @@ class Connection:
                 if service.match_ips:
                     access_list_name = _generate_acl_name(service.name)
                     commands.append(
+                        "no ip access-list extended {}".format(access_list_name)
+                    )
+                    commands.append(
                         "ip access-list extended {}".format(access_list_name)
                     )
                     for ip in service.match_ips.split(","):
@@ -206,6 +209,9 @@ class Connection:
                 if service.match_dscp:
                     for dscp in service.match_dscp.split(","):
                         commands.append("match dscp {}".format(_no_spaces(dscp)))
+                commands.append(
+                    "no policy-map {}".format(_generate_policy_name(policy.name))
+                )
                 commands.append(
                     "policy-map {}".format(_generate_policy_name(policy.name))
                 )
