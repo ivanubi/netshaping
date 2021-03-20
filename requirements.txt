@@ -13,7 +13,7 @@ Flask-Login==0.5.0
 Flask-SQLAlchemy==2.4.4
 future==0.18.2
 itsdangerous==1.1.0
-Jinja2==2.11.2
+Jinja2==2.11.3
 kombu==4.6.11
 MarkupSafe==1.1.1
 netmiko==3.1.1
