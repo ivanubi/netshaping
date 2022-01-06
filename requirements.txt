@@ -4,7 +4,7 @@ attrs==20.1.0
 bcrypt==3.1.7
 billiard==3.6.3.0
 black==19.10b0
-celery==4.4.7
+celery==5.2.2
 cffi==1.14.0
 click==7.1.2
 cryptography==3.2
